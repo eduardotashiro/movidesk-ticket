@@ -1,7 +1,7 @@
 {
   "name": "ticket",
   "version": "1.0.0",
-  "description": "funciona caralho",
+  "description": "Integração com Movidesk & Slack para abertura e gestão de tickets via modal interativo.",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
