@@ -1,17 +1,16 @@
-
-
-//Função que chama a API do Movidesk
-
 import fetch from "node-fetch"
 
+import dotenv from "dotenv"
+dotenv.config()
 
-export async function createTicket({ nome, email, assunto, descricao, servico }) {
+
+export async function createTicket({ clientId, assunto, descricao, servico }) {
 
 
     const ticketBody = {
         type: 2,
         subject: assunto,
-        category: categoria.serviceSecondLevel,
+        category: servico.serviceSecondLevel,
         serviceFirstLevelId: servico?.serviceFirstLevelId,
         serviceFirstLevel: servico?.serviceFirstLevel,
         serviceSecondLevel: servico?.serviceSecondLevel,
@@ -19,11 +18,11 @@ export async function createTicket({ nome, email, assunto, descricao, servico })
         urgency: "Média",
         status: "Novo",
         createdBy: {
-            id: 1857718041, //ID.AGENTE ?
+            id: clientId, 
         },
         clients: [
             {
-                id: 1857718041 || email || nome //COD.REF.CRIADOR.TICKET
+                id: clientId 
             }
         ],
         actions: [
@@ -32,7 +31,7 @@ export async function createTicket({ nome, email, assunto, descricao, servico })
                 origin: 9,
                 description: "<p>" + descricao + "</p>",
                 createdBy: {
-                    id: 1857718041 //COD.REF.CRIADOR.TICKET
+                    id: clientId 
                 }
             },
             {
@@ -40,7 +39,7 @@ export async function createTicket({ nome, email, assunto, descricao, servico })
                 origin: 9,
                 description: "<p>Ticket Criado Via Slack</p>",
                 createdBy: {
-                    id: 1857718041 //COD.REF.CRIADOR.TICKET
+                    id: clientId 
                 }
             }
         ]
@@ -56,8 +55,9 @@ export async function createTicket({ nome, email, assunto, descricao, servico })
     if (!response.ok) {
         const text = await response.text()
         throw new Error(`Movidesk API retornou ${response.status}: ${text}`)
-    } else {
-        return await response.json()
     }
-}  
+
+    return await response.json()
+
+}
 

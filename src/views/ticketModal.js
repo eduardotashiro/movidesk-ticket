@@ -1,5 +1,13 @@
 import { servicesMap } from "../utils/servicesMap.js"
 import { createTicket } from "../services/movidesk.js"
+import { readEmail } from "../utils/fileReader.js"
+
+const users = readEmail('/home/odraude/Área de trabalho/ticket/src/private/userInfo.json')
+
+ function getIdByEmail(email) {
+    return users.find(u => u.email === email) || null
+}
+
 
 export function buildTicketModal() {
     return {
@@ -9,15 +17,6 @@ export function buildTicketModal() {
         submit: { type: "plain_text", text: "Enviar" },
         close: { type: "plain_text", text: "Cancelar" },
         blocks: [
-            {
-                type: "input",
-                block_id: "nome",
-                label: { type: "plain_text", text: "Nome completo" },
-                element: { type: "plain_text_input", action_id: "nome_input" },
-            },
-            {
-                "type": "divider"
-            },
             {
                 type: "input",
                 block_id: "email",
@@ -127,31 +126,44 @@ export function buildTicketModal() {
     }
 }
 
+
+
 export function registerTicketModal(app) {
-app.view("ticket_modal", async ({ ack, view, client }) => {
-    await ack()
+    app.view("ticket_modal", async ({ ack, view, client }) => {
+        await ack()
 
 
-    const nome = view.state.values.nome.nome_input.value
-    const email = view.state.values.email.email_text_input_action.value
-    const servicoSelecionado = view.state.values.servico.servico_input.selected_option.value
-    const assunto = view.state.values.assunto.assunto_input.value
-    const descricao = view.state.values.descricao.descricao_input.value
+     
+        const servicoSelecionado = view.state.values.servico.servico_input.selected_option.value
+        const servico = servicesMap[servicoSelecionado]
+        const assunto = view.state.values.assunto.assunto_input.value
+        const descricao = view.state.values.descricao.descricao_input.value
+        const email = view.state.values.email.email_text_input_action.value
 
-    const servico = servicesMap[servicoSelecionado]
+        const user = getIdByEmail(email)
 
-    try {
-        const ticket = await createTicket({ nome, email, assunto, descricao, servico })
+        if (!user) {
+            await client.chat.postMessage({
+                channel: "#social",
+                text: `email incorreto, ta esquecido hein -> ${email}`
+            })
 
-        await client.chat.postMessage({
-            channel: "#social",
-            text: `✅ Ticket criado com sucesso!\n*ID:* ${ticket.id}\n*Protocolo:* ${ticket.protocol}`,
-        })
-    } catch (error) {
-        await client.chat.postMessage({
-            channel: "#social",
-            text: `⚠️ Erro ao criar o ticket: ${error.message}`,
-        })
-    }
-})
+            return
+        }
+
+
+        try {
+            const ticket = await createTicket({ clientId: user.id, assunto, descricao, servico })
+
+            await client.chat.postMessage({
+                channel: "#social",
+                text: `✅ Ticket criado com sucesso!\n*ID:* ${ticket.id}\n*Protocolo:* ${ticket.protocol}`,
+            })
+        } catch (error) {
+            await client.chat.postMessage({
+                channel: "#social",
+                text: `⚠️ Erro ao criar o ticket: ${error.message}`,
+            })
+        }
+    })
 }
