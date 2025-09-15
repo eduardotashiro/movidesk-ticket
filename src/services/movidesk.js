@@ -10,7 +10,7 @@ export async function createTicket({ clientId, assunto, descricao, servico }) {
     const ticketBody = {
         type: 2,
         subject: assunto,
-        category: servico.serviceSecondLevel,
+        category: null,
         serviceFirstLevelId: servico?.serviceFirstLevelId,
         serviceFirstLevel: servico?.serviceFirstLevel,
         serviceSecondLevel: servico?.serviceSecondLevel,
