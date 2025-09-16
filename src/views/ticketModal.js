@@ -7,6 +7,10 @@ export function buildTicketModal() {
     return {
         type: "modal",
         callback_id: "ticket_modal",
+        private_metadata: JSON.stringify({// ALTERADO metadado enviar p/threadm &canal
+        channel_id: body.channel_id,// ALTERADO metadado enviar p/threadm &canal
+        thread_ts: body.message_ts || null// ALTERADO metadado enviar p/threadm &canal
+        }),
         title: { type: "plain_text", text: "Abrir Ticket" },
         submit: { type: "plain_text", text: "Enviar" },
         close: { type: "plain_text", text: "Cancelar" },
@@ -130,11 +134,11 @@ function getIdByEmail(email) {
 
 
 export function registerTicketModal(app) {
-    app.view("ticket_modal", async ({ ack, view, client }) => { //BODY?
+    app.view("ticket_modal", async ({ ack,body, view, client }) => { //BODY?
         await ack()
 
-        const {channel_id, thread_ts} = JSON.parse(view.metadata)// ALTERADO metadado enviar p/threadm &canal
-        
+        const metadata = JSON.parse(view.private_metadata)// ALTERADO metadado enviar p/threadm &canal
+
 
         const servicoSelecionado = view.state.values.servico.servico_input.selected_option.value
         const servico = servicesMap[servicoSelecionado]
@@ -146,8 +150,8 @@ export function registerTicketModal(app) {
 
         if (!user) {
             await client.chat.postMessage({
-                channel: channel_id,// ALTERADO metadado enviar p/threadm &canal
-                thread_ts: thread_ts,// ALTERADO metadado enviar p/threadm &canal
+                channel: metadata.channel,// ALTERADO metadado enviar p/threadm &canal
+                thread_ts: metadata.thread_ts,// ALTERADO metadado enviar p/threadm &canal
                 text: `${email} E-mail inválido, verifique se este email está vinculado ao movidesk`
             })
 
