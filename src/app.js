@@ -11,9 +11,9 @@ dotenv.config()
 })
 
 // importa os handlers e passa o app
-import { registerTicketCommand } from "./commands/ticket.js";
-import { registerTicketModal } from "./views/ticketModal.js";
+import { registerTicketCommand } from "./commands/ticket.js"
+import { registerTicketModal } from "./views/ticketModal.js"
 
-registerTicketCommand(app);
-registerTicketModal(app);
+registerTicketCommand(app)
+registerTicketModal(app)
 

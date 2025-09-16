@@ -1,4 +1,4 @@
-import { buildTicketModal } from "../views/ticketModal.js";
+import { buildTicketModal } from "../views/ticketModal.js"
 
 export function registerTicketCommand(app) {
     app.command("/ticket", async ({ ack, body, client }) => {
