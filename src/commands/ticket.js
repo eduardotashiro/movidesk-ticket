@@ -8,7 +8,11 @@ export function registerTicketCommand(app) {
 
         await client.views.open({
             trigger_id: body.trigger_id,
-            view: buildTicketModal()
+            view: buildTicketModal(),
+            metadata:JSON.stringify({// ALTERADO metadado enviar p/threadm &canal
+                channel_id: body.channel_id,// ALTERADO metadado enviar p/threadm &canal
+                thread_ts: body.thread_ts || body.ts// ALTERADO metadado enviar p/threadm &canal
+            })
         })
     })
 }

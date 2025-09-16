@@ -30,7 +30,7 @@ export function buildTicketModal() {
                     option_groups: [
                         {
                             label: { type: "plain_text", text: "1 | Solicitações" },
-                            options: [                                                                         
+                            options: [
                                 { text: { type: "plain_text", text: "a) Alteração de Dados Cadastrais" }, value: "1195946" },
                                 { text: { type: "plain_text", text: "b) Alterar Dados do Merchant (Risco)" }, value: "1226508" },
                                 { text: { type: "plain_text", text: "c) Carta de Circularização" }, value: "1244237" },
@@ -124,14 +124,17 @@ export function buildTicketModal() {
 
 const users = readEmail('/home/odraude/Área de trabalho/ticket/src/private/userInfo.json')
 
- function getIdByEmail(email) {
+function getIdByEmail(email) {
     return users.find(u => u.email === email) || null
 }
 
 
 export function registerTicketModal(app) {
-    app.view("ticket_modal", async ({ ack, view, client }) => {
+    app.view("ticket_modal", async ({ ack, view, client }) => { //BODY?
         await ack()
+
+        const {channel_id, thread_ts} = JSON.parse(view.metadata)// ALTERADO metadado enviar p/threadm &canal
+        
 
         const servicoSelecionado = view.state.values.servico.servico_input.selected_option.value
         const servico = servicesMap[servicoSelecionado]
@@ -143,8 +146,9 @@ export function registerTicketModal(app) {
 
         if (!user) {
             await client.chat.postMessage({
-                channel: "#social",
-                text: `email incorreto, ta esquecido hein -> ${email}`
+                channel: channel_id,// ALTERADO metadado enviar p/threadm &canal
+                thread_ts: thread_ts,// ALTERADO metadado enviar p/threadm &canal
+                text: `${email} E-mail inválido, verifique se este email está vinculado ao movidesk`
             })
 
             return
@@ -155,12 +159,14 @@ export function registerTicketModal(app) {
             const ticket = await createTicket({ clientId: user.id, assunto, descricao, servico })
 
             await client.chat.postMessage({
-                channel: "#social",
-                text: `✅ Ticket criado com sucesso!\n*ID:* ${ticket.id}\n*Protocolo:* ${ticket.protocol}`,
+                channel: channel_id,// ALTERADO metadado enviar p/threadm &canal
+                thread_ts: thread_ts, // ALTERADO metadado enviar p/threadm &canal
+                text: `✅ Ticket criado com sucesso!\n*Protocolo:* ${ticket.protocol}`,
             })
         } catch (error) {
             await client.chat.postMessage({
-                channel: "#social",
+                channel: channel_id,// ALTERADO metadado enviar p/threadm &canal
+                thread_ts: thread_ts,// ALTERADO metadado enviar p/threadm &canal
                 text: `⚠️ Erro ao criar o ticket: ${error.message}`,
             })
         }
