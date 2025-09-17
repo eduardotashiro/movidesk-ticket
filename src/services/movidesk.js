@@ -18,7 +18,7 @@ export async function createTicket({ clientId, assunto, descricao, servico }) {
         urgency: "Média",
         status: "Novo",
         createdBy: {
-            id: clientId, 
+            id: clientId, //HARDCODE ID ORIGIN | EMOJI GERA TICKET | DEIXAR SOLICITANDE EM CC | THREAD | RETORNAR <ID> PRTOCOLO. REMOVER ID TICKET | CLIENT/AGENTE)(TODOMUNDO) PODE REAGIR ::HAND:: E CRIAR TICKET 
         },
         clients: [
             {
