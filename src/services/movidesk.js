@@ -18,7 +18,7 @@ export async function createTicket({ clientId, assunto, descricao, servico }) {
         urgency: "Média",
         status: "Novo",
         createdBy: {
-            id: clientId, //HARDCODE ID ORIGIN | EMOJI GERA TICKET | DEIXAR SOLICITANDE EM CC | THREAD | RETORNAR <ID> PRTOCOLO. REMOVER ID TICKET | CLIENT/AGENTE)(TODOMUNDO) PODE REAGIR ::HAND:: E CRIAR TICKET 
+            id: clientId, //partner cria o ticket, ajuda a liderança com as métricas e contabiliza quantidade e assunto de cada ticket
         },
         clients: [
             {
@@ -31,7 +31,7 @@ export async function createTicket({ clientId, assunto, descricao, servico }) {
                 origin: 9,
                 description: "<p>" + descricao + "</p>",
                 createdBy: {
-                    id: clientId 
+                    id: clientId //partner é o cliente do ticket, ajuda a liderança com as métricas e contabiliza quantidade e assunto de cada ticket
                 }
             },
             {
@@ -39,7 +39,7 @@ export async function createTicket({ clientId, assunto, descricao, servico }) {
                 origin: 9,
                 description: "<p>Ticket Criado Via Slack</p>",
                 createdBy: {
-                    id: clientId 
+                    id: clientId //partner é o cliente do ticket, ajuda a liderança com as métricas e contabiliza quantidade e assunto de cada ticket
                 }
             }
         ]

@@ -21,7 +21,7 @@ export function buildTicketModal() {
                     option_groups: [
                         {
                             label: { type: "plain_text", text: "1 | Solicitações" },
-                            options: [                                                                         
+                            options: [
                                 { text: { type: "plain_text", text: "a) Alteração de Dados Cadastrais" }, value: "1195946" },
                                 { text: { type: "plain_text", text: "b) Alterar Dados do Merchant (Risco)" }, value: "1226508" },
                                 { text: { type: "plain_text", text: "c) Carta de Circularização" }, value: "1244237" },
@@ -115,27 +115,52 @@ export function buildTicketModal() {
 
 const users = readEmail('/home/odraude/Área de trabalho/ticket/src/private/userInfo.json')
 
- function getIdByEmail(email) {
+function getIdByEmail(email) {
     return users.find(u => u.email === email) || null
 }
 
 
 export function registerTicketModal(app) {
-    app.view("ticket_modal", async ({ ack, view, client }) => {
+    app.view("ticket_modal", async ({ ack, view, body, client }) => {
         await ack()
 
         const servicoSelecionado = view.state.values.servico.servico_input.selected_option.value
         const servico = servicesMap[servicoSelecionado]
         const assunto = view.state.values.assunto.assunto_input.value
         const descricao = view.state.values.descricao.descricao_input.value
-        const email = view.state.values.email.email_text_input_action.value
 
-        const user = getIdByEmail(email)
+        //Pega o userId do submitter
+        const userId = body.user.id
+
+        // Busca infos do usuário no Slack
+        let email
+        try {
+            const userInfo = await client.users.info({ user: userId })
+            email = userInfo.user.profile.email;
+        } catch (err) {
+            await client.chat.postMessage({
+                channel: "#social",
+                text: `⚠️ Não consegui buscar o email do usuário: ${err.message}`,
+            })
+            return
+        }
+
+        // Localiza no arquivo JSON 
+        const user = getIdByEmail(email);
 
         if (!user) {
             await client.chat.postMessage({
                 channel: "#social",
-                text: `email incorreto, ta esquecido hein -> ${email}`
+                text: `⚠️ Email não encontrado no JSON -> ${email}`,
+            });
+            return;
+        }
+
+
+        if (!user) {
+            await client.chat.postMessage({
+                channel: "#social",
+                text: `email incorreto -> ${email}`
             })
 
             return
@@ -143,11 +168,16 @@ export function registerTicketModal(app) {
 
 
         try {
-            const ticket = await createTicket({ clientId: user.id, assunto, descricao, servico })
+            const ticket = await createTicket({
+                 clientId:user.id, // id do json
+                  assunto,
+                   descricao,
+                    servico 
+                })
 
             await client.chat.postMessage({
                 channel: "#social",
-                text: `✅ Ticket criado com sucesso!\n*ID:* ${ticket.id}\n*Protocolo:* ${ticket.protocol}`,
+                text: `✅ Ticket criado com sucesso!\n*Protocolo:* ${ticket.protocol}`,
             })
         } catch (error) {
             await client.chat.postMessage({
@@ -157,3 +187,4 @@ export function registerTicketModal(app) {
         }
     })
 }
+
