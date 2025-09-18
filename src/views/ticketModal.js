@@ -107,8 +107,34 @@ export function buildTicketModal() {
                 label: {
                     type: "plain_text", text: "Descrição do Ticket"
                 }
+            },
+           /* {
+                title: {
+                    type: "plain_text",
+                    text: "Upload a Document"
+                },
+                blocks: [
+                    {
+                        type: "input",
+                        block_id: "file_upload_block",
+                        label: {
+                            type: "plain_text",
+                            text: "Select your document"
+                        },
+                        element: {
+                            type: "file_input",
+                            action_id: "document_file_input",
+                            filetypes: ["pdf", "doc", "docx"],
+                            max_files: 1
+                        }
+                    }
+                ],
+                submit: {
+                    type: "plain_text",
+                    text: "Submit"
+                }
+            }*/
 
-            }
         ],
     }
 }
@@ -130,7 +156,7 @@ export function registerTicketModal(app) {
         const descricao = view.state.values.descricao.descricao_input.value
 
         // PEGA O CANAL DO private_metadata
-        const channelId = body.view?.private_metadata;  
+        const channelId = body.view?.private_metadata;
         if (!channelId) {
             console.error("Canal não definido para enviar a mensagem");
             console.log("body.view:", body.view);
