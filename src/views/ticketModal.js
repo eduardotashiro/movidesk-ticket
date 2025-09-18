@@ -13,15 +13,6 @@ export function buildTicketModal() {
         blocks: [
             {
                 type: "input",
-                block_id: "email",
-                label: { type: "plain_text", text: "E-mail" },
-                element: { type: "email_text_input", action_id: "email_text_input_action" },
-            },
-            {
-                "type": "divider"
-            },
-            {
-                type: "input",
                 block_id: "servico",
                 label: { type: "plain_text", text: "Serviço" },
                 element: {
