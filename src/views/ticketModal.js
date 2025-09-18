@@ -108,13 +108,7 @@ export function buildTicketModal() {
                     type: "plain_text", text: "Descrição do Ticket"
                 }
             },
-           /* {
-                title: {
-                    type: "plain_text",
-                    text: "Upload a Document"
-                },
-                blocks: [
-                    {
+            {
                         type: "input",
                         block_id: "file_upload_block",
                         label: {
@@ -124,16 +118,10 @@ export function buildTicketModal() {
                         element: {
                             type: "file_input",
                             action_id: "document_file_input",
-                            filetypes: ["pdf", "doc", "docx"],
-                            max_files: 1
+                            filetypes: ["pdf", "jpg", "png", "doc",],
+                            max_files: 10
                         }
-                    }
-                ],
-                submit: {
-                    type: "plain_text",
-                    text: "Submit"
-                }
-            }*/
+            }
 
         ],
     }
