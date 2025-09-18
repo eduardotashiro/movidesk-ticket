@@ -129,6 +129,16 @@ export function registerTicketModal(app) {
         const assunto = view.state.values.assunto.assunto_input.value
         const descricao = view.state.values.descricao.descricao_input.value
 
+        // PEGA O CANAL DO private_metadata
+        const channelId = body.view?.private_metadata;  
+        if (!channelId) {
+            console.error("Canal não definido para enviar a mensagem");
+            console.log("body.view:", body.view);
+            return;
+        }
+        console.log("Canal para enviar mensagem:", channelId);
+
+
         //Pega o userId do submitter
         const userId = body.user.id
 
@@ -139,8 +149,8 @@ export function registerTicketModal(app) {
             email = userInfo.user.profile.email;
         } catch (err) {
             await client.chat.postMessage({
-                channel: "#social",
-                text: `⚠️ Não consegui buscar o email do usuário: ${err.message}`,
+                channel: channelId,
+                text: `Não consegui buscar o email do usuário: ${err.message}`,
             })
             return
         }
@@ -150,39 +160,29 @@ export function registerTicketModal(app) {
 
         if (!user) {
             await client.chat.postMessage({
-                channel: "#social",
-                text: `⚠️ Email não encontrado no JSON -> ${email}`,
+                channel: channelId,
+                text: `Email não encontrado no JSON -> ${email}`,
             });
             return;
         }
 
 
-        if (!user) {
-            await client.chat.postMessage({
-                channel: "#social",
-                text: `email incorreto -> ${email}`
-            })
-
-            return
-        }
-
-
         try {
             const ticket = await createTicket({
-                 clientId:user.id, // id do json
-                  assunto,
-                   descricao,
-                    servico 
-                })
+                clientId: user.id, // id do json
+                assunto,
+                descricao,
+                servico
+            })
 
             await client.chat.postMessage({
-                channel: "#social",
-                text: `✅ Ticket criado com sucesso!\n*Protocolo:* ${ticket.protocol}`,
+                channel: channelId,
+                text: `Ticket criado com sucesso!\n*Protocolo:* ${ticket.protocol}`,
             })
         } catch (error) {
             await client.chat.postMessage({
-                channel: "#social",
-                text: `⚠️ Erro ao criar o ticket: ${error.message}`,
+                channel: channelId,
+                text: `Erro ao criar o ticket: ${error.message}`,
             })
         }
     })
