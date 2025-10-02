@@ -1,44 +1,45 @@
-import fetch from "node-fetch"
-
 import dotenv from "dotenv"
 dotenv.config()
 
 
-export async function createTicket({ clientId, assunto, descricao, servico }) {
+export async function createTicket({ clientId, assunto, descricao, servico, threadContext }) { //payload
 
 
     const ticketBody = {
         type: 2,
         subject: assunto,
         category: null,
-        serviceFirstLevelId: servico?.serviceFirstLevelId,
-        serviceFirstLevel: servico?.serviceFirstLevel,
-        serviceSecondLevel: servico?.serviceSecondLevel,
-        serviceThirdLevel: servico?.serviceThirdLevel,
+        serviceFirstLevelId:null,
+        serviceFirstLevel:null,
+        serviceSecondLevel:null,
+        serviceThirdLevel:null,
         urgency: "Média",
         status: "Novo",
-        createdBy: {
+        createdBy:
+        {
             id: clientId, //partner cria o ticket, ajuda a liderança com as métricas e contabiliza quantidade e assunto de cada ticket
         },
         clients: [
             {
-                id: clientId 
+                id: clientId
             }
         ],
         actions: [
             {
                 type: 2,
                 origin: 9,
-                description: "<p>" + descricao + "</p>",
-                createdBy: {
+                description: descricao,
+                createdBy:
+                {
                     id: clientId //partner é o cliente do ticket, ajuda a liderança com as métricas e contabiliza quantidade e assunto de cada ticket
                 }
             },
             {
                 type: 1,
                 origin: 9,
-                description: "<p>Ticket Criado Via Slack</p>",
-                createdBy: {
+                description: threadContext,
+                createdBy:
+                {
                     id: clientId //partner é o cliente do ticket, ajuda a liderança com as métricas e contabiliza quantidade e assunto de cada ticket
                 }
             }
@@ -46,7 +47,7 @@ export async function createTicket({ clientId, assunto, descricao, servico }) {
     }
 
 
-    const response = await fetch(`https://api.movidesk.com/public/v1/tickets?token=${process.env.MOVIDESK_TOKEN}`, {
+    const response = await fetch(`${process.env.URL}?token=${process.env.MOVIDESK_TOKEN}`, {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(ticketBody),
@@ -54,7 +55,8 @@ export async function createTicket({ clientId, assunto, descricao, servico }) {
 
     if (!response.ok) {
         const text = await response.text()
-        throw new Error(`Movidesk API retornou ${response.status}: ${text}`)
+        console.error(`Movidesk API retornou ${response.status}: ${text}`)
+        throw new Error(`"Não foi possível criar o ticket no momento.\n\nTente novamente mais tarde."`)
     }
 
     return await response.json()
