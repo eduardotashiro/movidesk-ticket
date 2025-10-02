@@ -4,6 +4,8 @@ dotenv.config()
 
 export async function createTicket({ clientId, assunto, descricao, servico, threadContext }) { //payload
 
+     
+    //const profileType = movideskPerson?.profileType ?? 3
 
     const ticketBody = {
         type: 2,
@@ -18,10 +20,12 @@ export async function createTicket({ clientId, assunto, descricao, servico, thre
         createdBy:
         {
             id: clientId, //partner cria o ticket, ajuda a liderança com as métricas e contabiliza quantidade e assunto de cada ticket
+           // profileType
         },
         clients: [
             {
-                id: clientId
+                id: clientId,
+               // profileType
             }
         ],
         actions: [
@@ -31,7 +35,8 @@ export async function createTicket({ clientId, assunto, descricao, servico, thre
                 description: descricao,
                 createdBy:
                 {
-                    id: clientId //partner é o cliente do ticket, ajuda a liderança com as métricas e contabiliza quantidade e assunto de cada ticket
+                    id: clientId, //partner é o cliente do ticket, ajuda a liderança com as métricas e contabiliza quantidade e assunto de cada ticket
+                   // profileType
                 }
             },
             {
@@ -40,14 +45,15 @@ export async function createTicket({ clientId, assunto, descricao, servico, thre
                 description: threadContext,
                 createdBy:
                 {
-                    id: clientId //partner é o cliente do ticket, ajuda a liderança com as métricas e contabiliza quantidade e assunto de cada ticket
+                    id: clientId, //partner é o cliente do ticket, ajuda a liderança com as métricas e contabiliza quantidade e assunto de cada ticket
+                   // profileType
                 }
             }
         ]
     }
 
 
-    const response = await fetch(`${process.env.URL}?token=${process.env.MOVIDESK_TOKEN}`, {
+    const response = await fetch(`${process.env.URL_CREATE_TICKET}?token=${process.env.MOVIDESK_TOKEN}`, {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(ticketBody),

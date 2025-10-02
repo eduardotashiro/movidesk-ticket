@@ -15,7 +15,7 @@ export async function uploadSlackFileToMovidesk(ticketId, file) {
     formData.append("file", await slackResponse.blob(), file.name) // Usa slackResponse.body direto como Blob/stream
   
     const movideskResponse = await fetch(
-        `${process.env.URLFILE}?token=${process.env.MOVIDESK_TOKEN}&id=${ticketId}&actionId=1`, // Envia para o Movidesk
+        `${process.env.URL_CREATE_FILE}?token=${process.env.MOVIDESK_TOKEN}&id=${ticketId}&actionId=1`, // Envia para o Movidesk
         {
             method: "POST",
             body: formData
