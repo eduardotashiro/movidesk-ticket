@@ -10,7 +10,7 @@ export async function uploadSlackFileToMovidesk(ticketId, file) {
     if (!slackResponse.ok) 
     throw new Error("Aquivo não suportado");
 
-    const formData = new FormData() // FormData nativo
+    const formData = new FormData()
 
     formData.append("file", await slackResponse.blob(), file.name) // Usa slackResponse.body direto como Blob/stream
   

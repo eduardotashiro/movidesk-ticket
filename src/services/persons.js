@@ -1,27 +1,39 @@
-export async function ensurePerson(email, nome) {
+export async function getOrCreatePerson(email, nome) {
     console.log(` Buscando pessoa com email: ${email}`)
     
-    // 1. Busca pessoa pelo email
+    
     const searchUrl = `${process.env.URL_PERSON}?token=${process.env.MOVIDESK_TOKEN}&$filter=emails/any(e: e/email eq '${email}')`
     console.log(" URL de busca:", searchUrl)
     
+
     const response = await fetch(searchUrl)
     console.log(` Status da busca: ${response.status}`)
     
+
+     if (response.status === 401) {
+        throw new Error("Não autorizado (401)  verificar o token ? ")
+    }
+
+    if (response.status === 403) {
+        throw new Error("Acesso proibido (403)  não tem permissão")
+    }
+
+
     const data = await response.json()
     console.log(" Dados retornados da busca:", JSON.stringify(data, null, 2))
 
     
     if (!data || data.length === 0) {
-        console.log(" Usuário não encontrado, criando...")
+        console.log(" Usuário não encontrado, então cria")
         
+
         const newPersonData = {
             isActive: true,
             personType: 1,
             profileType: 2,
             accessProfile: "Clientes",
-            businessName: nome, //
-            userName: nome, //hardcode teste?!
+            businessName: nome,
+            userName: email, 
             cultureId: "pt-BR",
             timeZoneId: "America/Sao_Paulo",
             emails: [
@@ -43,8 +55,10 @@ export async function ensurePerson(email, nome) {
             ],
         }
 
+
         console.log(" Enviando dados para criação:", JSON.stringify(newPersonData, null, 2))
         
+
         try {
             const newPersonResponse = await fetch(
                 `${process.env.MOVIDESK_API}/public/v1/persons?token=${process.env.MOVIDESK_TOKEN}`,
@@ -55,8 +69,10 @@ export async function ensurePerson(email, nome) {
                 }
             )
 
+
             console.log(` Status da criação: ${newPersonResponse.status}`)
             
+
             if (!newPersonResponse.ok) {
                 const errorText = await newPersonResponse.text()
                 console.error(" Erro detalhado da API Movidesk:", errorText)
@@ -64,18 +80,20 @@ export async function ensurePerson(email, nome) {
                 throw new Error(`Erro ao criar usuário: ${newPersonResponse.status} - ${errorText}`)
             }
 
+
             const newPerson = await newPersonResponse.json()
             console.log(" Usuário criado com ID:", newPerson.id)
             console.log(" Usuário criado com ID completo:", JSON.stringify(newPerson))
             return newPerson.id
             
+
         } catch (error) {
             console.error(" ERRO NA REQUISIÇÃO:", error.message)
             throw error
         }
     }
 
-    // 3. Se encontrou mas está inativo tenta ativar teste
+
     const person = data[0]
     console.log(` Usuário encontrado: ${person.id}, Ativo: ${person.isActive}`)
     
@@ -83,7 +101,7 @@ export async function ensurePerson(email, nome) {
         console.log(" Reativando usuário...")
         
         const activateResponse = await fetch(
-            `${process.env.MOVIDESK_API}/public/v1/persons/${person.id}?token=${process.env.MOVIDESK_TOKEN}`,
+            `${process.env.MOVIDESK_API}/public/v1/persons/?token=${process.env.MOVIDESK_TOKEN}&id=${person.id}`,
             {
                 method: "PATCH", 
                 headers: { "Content-Type": "application/json" },
@@ -91,7 +109,7 @@ export async function ensurePerson(email, nome) {
             }
         )
         
-        console.log(`📨 Status da reativação: ${activateResponse.status}`)
+        console.log(`Status da reativação: ${activateResponse.status}`)
         
         if (!activateResponse.ok) {
             throw new Error("Erro ao reativar usuário no Movidesk")
@@ -99,7 +117,7 @@ export async function ensurePerson(email, nome) {
         
         console.log(" Usuário reativado!")
     }
-    
-    console.log(` Retornando ID: ${person.id}`)
+
+    console.log(`Retornando ID: ${person.id}`)
     return person.id
 }

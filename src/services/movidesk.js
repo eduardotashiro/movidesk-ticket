@@ -2,10 +2,7 @@ import dotenv from "dotenv"
 dotenv.config()
 
 
-export async function createTicket({ clientId, assunto, descricao, servico, threadContext }) { //payload
-
-     
-    //const profileType = movideskPerson?.profileType ?? 3
+export async function createTicket({ clientId, assunto, descricao, threadContext }) { 
 
     const ticketBody = {
         type: 2,
@@ -20,12 +17,11 @@ export async function createTicket({ clientId, assunto, descricao, servico, thre
         createdBy:
         {
             id: clientId, //partner cria o ticket, ajuda a liderança com as métricas e contabiliza quantidade e assunto de cada ticket
-           // profileType
+           
         },
         clients: [
             {
-                id: clientId,
-               // profileType
+                id: clientId,        
             }
         ],
         actions: [
@@ -35,8 +31,7 @@ export async function createTicket({ clientId, assunto, descricao, servico, thre
                 description: descricao,
                 createdBy:
                 {
-                    id: clientId, //partner é o cliente do ticket, ajuda a liderança com as métricas e contabiliza quantidade e assunto de cada ticket
-                   // profileType
+                    id: clientId, //partner é o cliente do ticket, ajuda a liderança com as métricas e contabiliza quantidade e assunto de cada ticket          
                 }
             },
             {
@@ -46,7 +41,6 @@ export async function createTicket({ clientId, assunto, descricao, servico, thre
                 createdBy:
                 {
                     id: clientId, //partner é o cliente do ticket, ajuda a liderança com as métricas e contabiliza quantidade e assunto de cada ticket
-                   // profileType
                 }
             }
         ]
