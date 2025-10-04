@@ -12,7 +12,7 @@ export function registerTicketReaction(app) {
         console.log("Emoji:", event.reaction)
         console.log("Mensagem:", event.item)
 
-        if (event.reaction !== "cactus") return
+        if (event.reaction !== "sos") return //cactus ?!
 
         try {
             // Pegar mensagens na thread
@@ -51,6 +51,7 @@ export function registerTicketReaction(app) {
                 clientId: movideskId,
                 assunto: "Ticket via Slack",
                 descricao: text,
+                servico:null,
                 threadContext,
             })
 
@@ -64,9 +65,9 @@ export function registerTicketReaction(app) {
             // Responder na thread com link do ticket
             const linkMovidesk = `${process.env.URL_TICKET_LINK}${ticket.protocol}`
             await client.chat.postMessage({
-                channel: event.item.channel,                                                                                                             // ${ticket.protocol}>
+                channel: event.item.channel,                                                                                                            
                 thread_ts: event.item.ts,
-                text: `Olá <@${event.user}>.\n\nTicket criado com sucesso! :clap::skin-tone-3:\n\nClique aqui :point_right::skin-tone-3: <${linkMovidesk}|${ticket.protocol}> para acompanhar os detalhes da sua solicitação.`,
+                text: `Olá <@${messageAuthorId}> :wave::skin-tone-4:\n\nSeu ticket foi criado com sucesso no Movidesk!:tada:\n\nVocê pode acompanhar os detalhes da sua solicitação aqui: <${linkMovidesk}|${ticket.protocol}>\n\nObrigado por reportar o problema! Nossa equipe irá tratá-lo por lá. `,
             })
 
         } catch (error) {

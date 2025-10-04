@@ -26,7 +26,7 @@ export async function uploadSlackFileToMovidesk(ticketId, file) {
         const text = await movideskResponse.text()
         console.error(`Movidesk API retornou ${movideskResponse.status}: ${text}`)
 
-        throw new Error("Não foi possível anexar o arquivo ao ticket. Tente novamente mais tarde.")
+        throw new Error("Não foi possível anexar o arquivo ao ticket.\n\nTente novamente mais tarde.")
     }
 
     return await movideskResponse.json()

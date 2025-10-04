@@ -4,20 +4,11 @@ export async function getOrCreatePerson(email, nome) {
     
     const searchUrl = `${process.env.URL_PERSON}?token=${process.env.MOVIDESK_TOKEN}&$filter=emails/any(e: e/email eq '${email}')`
     console.log(" URL de busca:", searchUrl)
-    
+
 
     const response = await fetch(searchUrl)
     console.log(` Status da busca: ${response.status}`)
     
-
-     if (response.status === 401) {
-        throw new Error("Não autorizado (401)  verificar o token ? ")
-    }
-
-    if (response.status === 403) {
-        throw new Error("Acesso proibido (403)  não tem permissão")
-    }
-
 
     const data = await response.json()
     console.log(" Dados retornados da busca:", JSON.stringify(data, null, 2))
@@ -75,7 +66,7 @@ export async function getOrCreatePerson(email, nome) {
 
             if (!newPersonResponse.ok) {
                 const errorText = await newPersonResponse.text()
-                console.error(" Erro detalhado da API Movidesk:", errorText)
+                console.error(" Erro detalhado API Movidesk:", errorText)
                 console.error(" Status:", newPersonResponse.status)
                 throw new Error(`Erro ao criar usuário: ${newPersonResponse.status} - ${errorText}`)
             }
@@ -98,7 +89,7 @@ export async function getOrCreatePerson(email, nome) {
     console.log(` Usuário encontrado: ${person.id}, Ativo: ${person.isActive}`)
     
     if (!person.isActive) {
-        console.log(" Reativando usuário...")
+        console.log(" Reativa usuário...")
         
         const activateResponse = await fetch(
             `${process.env.MOVIDESK_API}/public/v1/persons/?token=${process.env.MOVIDESK_TOKEN}&id=${person.id}`,
