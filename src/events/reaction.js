@@ -52,7 +52,7 @@ export function registerTicketReaction(app) {
 
             const ticket = await createTicket({
                 clientId: movideskId,
-                assunto: `Ticket via Slack: ${text.subtring(0,50)}`,
+                assunto: `Ticket via Slack: ${text.substring(0,50)}`,
                 descricao: text,
                 servico: null,
                 threadContext,
