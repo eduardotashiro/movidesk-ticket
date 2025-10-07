@@ -1,23 +1,25 @@
 {
   "name": "ticket",
   "version": "1.0.0",
-  "description": "Integração com Movidesk & Slack para abertura e gestão de tickets via modal interativo.",
+  "description": "Integração com Movidesk & Slack para abertura e gestão de tickets via reação de mensagens.",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["slack , movidesk"],
+  "author": "Eduardo Tashiro",
   "license": "ISC",
   "type": "module",
   "dependencies": {
     "@slack/bolt": "^4.4.0",
-    "dotenv": "^17.2.2",
-    "nodemon": "^3.1.10",
-    "pg": "^8.16.3"
+    "dotenv": "^17.2.2"
   },
   "devDependencies": {
-    "ngrok": "^5.0.0-beta.2"
+    "ngrok": "^5.0.0-beta.2",
+    "nodemon": "^3.1.10"
+  },
+   "engines": {
+    "node": ">=18"
   }
 }

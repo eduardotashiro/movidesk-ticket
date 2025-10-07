@@ -12,6 +12,7 @@ export function registerTicketReaction(app) {
         console.log("Emoji:", event.reaction)
         console.log("Mensagem:", event.item)
 
+
         if (event.reaction !== "sos") return //cactus ?!
 
         try {
@@ -24,14 +25,18 @@ export function registerTicketReaction(app) {
             const originalMessage = result.messages[0]
             const text = originalMessage.text
             const files = originalMessage.files || []
-
-
-            //autor do problema
             const messageAuthorId = originalMessage.user
 
+            const placeholder = await client.chat.postMessage({
+                channel: event.item.channel,
+                thread_ts: event.item.ts,
+                text: `Olá <@${messageAuthorId}> :wave::skin-tone-4: \n\nSeu ticket esta sendo criado ... `
+            })
+
+            const placeholderTs = placeholder.ts
 
             // Pega infos do autor da mensagem
-            const messageAuthorInfo = await client.users.info ({ user: messageAuthorId })
+            const messageAuthorInfo = await client.users.info({ user: messageAuthorId })
             const email = messageAuthorInfo.user.profile.email
             const name = messageAuthorInfo.user.profile.real_name
 
@@ -39,21 +44,33 @@ export function registerTicketReaction(app) {
             const movideskId = await getOrCreatePerson(email, name)
 
 
-            // Criar link da thread
             const threadOrigin = result.messages[0].ts
             const tsForLink = threadOrigin.replace(".", "")
             const threadLink = `${process.env.URL_THREAD_LINK}/${event.item.channel}/p${tsForLink}`
             const threadContext = `<a href="${threadLink}" target="_blank">Abrir thread no Slack</a>`
 
 
-            // Criar ticket
             const ticket = await createTicket({
                 clientId: movideskId,
                 assunto: "Ticket via Slack",
                 descricao: text,
-                servico:null,
+                servico: null,
                 threadContext,
             })
+
+            // Responder na thread com link do ticket
+            const linkMovidesk = `${process.env.URL_TICKET_LINK}${ticket.protocol}`
+            await client.chat.update({
+                channel: event.item.channel,
+                ts: placeholderTs,
+                text: `Olá <@${messageAuthorId}> :wave::skin-tone-4:\n\nSeu ticket foi criado com sucesso no Movidesk!:tada:\n\nVocê pode acompanhar os detalhes da sua solicitação aqui: <${linkMovidesk}|${ticket.protocol}>\n\nObrigado por reportar o problema! Nossa equipe irá tratá-lo por lá. `,
+            })
+
+            console.log("Ticket completo:", JSON.stringify(ticket, null, 2))
+
+
+            const fullTicket = await fetch(`${process.env.MOVIDESK_API}/public/v1/tickets?token=${process.env.MOVIDESK_TOKEN}&id=${ticket.id}`)
+            console.log(fullTicket)
 
 
             // Upload de arquivos
@@ -62,20 +79,15 @@ export function registerTicketReaction(app) {
             }
 
 
-            // Responder na thread com link do ticket
-            const linkMovidesk = `${process.env.URL_TICKET_LINK}${ticket.protocol}`
-            await client.chat.postMessage({
-                channel: event.item.channel,                                                                                                            
-                thread_ts: event.item.ts,
-                text: `Olá <@${messageAuthorId}> :wave::skin-tone-4:\n\nSeu ticket foi criado com sucesso no Movidesk!:tada:\n\nVocê pode acompanhar os detalhes da sua solicitação aqui: <${linkMovidesk}|${ticket.protocol}>\n\nObrigado por reportar o problema! Nossa equipe irá tratá-lo por lá. `,
-            })
+            
+
 
         } catch (error) {
             console.error("Erro ao criar o ticket:", error)
 
             await client.chat.postMessage({
                 channel: event.item.channel,
-                thread_ts: event.item.ts,
+                thread_ts: placeholderTs,
                 text: `:warning: Ocorreu um problema ao criar seu ticket.\n\nNossa equipe já foi notificada e vamos resolver em breve.\n\nPor favor, tente novamente mais tarde.`,
             })
         }

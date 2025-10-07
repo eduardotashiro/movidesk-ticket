@@ -3,7 +3,6 @@ export async function getOrCreatePerson(email, nome) {
     
     
     const searchUrl = `${process.env.URL_PERSON}?token=${process.env.MOVIDESK_TOKEN}&$filter=emails/any(e: e/email eq '${email}')`
-    console.log(" URL de busca:", searchUrl)
 
 
     const response = await fetch(searchUrl)
