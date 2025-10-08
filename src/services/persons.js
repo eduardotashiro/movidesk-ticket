@@ -21,7 +21,7 @@ export async function getOrCreatePerson(email, nome) {
             isActive: true,
             personType: 1,
             profileType: 2,
-            accessProfile: "Clientes",
+            accessProfile: "Partner",
             businessName: nome,
             userName: email, 
             cultureId: "pt-BR",
