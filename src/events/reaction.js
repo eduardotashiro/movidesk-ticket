@@ -1,6 +1,7 @@
 import { createTicket } from "../services/movidesk.js"
 import { uploadSlackFileToMovidesk } from "../utils/uploadFile.js"
 import { getOrCreatePerson } from "../services/persons.js"
+
 import dotenv from "dotenv"
 
 dotenv.config()
@@ -37,7 +38,7 @@ export function registerTicketReaction(app) {
 
             // Pega infos do autor da mensagem
             const messageAuthorInfo = await client.users.info({ user: messageAuthorId })
-            const email = `${Date.now()}@gmail.com`//messageAuthorInfo.user.profile.email
+            const email = messageAuthorInfo.user.profile.email //`${Date.now()}@gmail.com` 
             const name = messageAuthorInfo.user.profile.real_name
 
 
