@@ -64,7 +64,7 @@ export function registerTicketReaction(app) {
             await client.chat.update({
                 channel: event.item.channel,
                 ts: placeholderTs,
-                text: `Olá <@${messageAuthorId}> :wave::skin-tone-4:\n\nSeu ticket foi criado com sucesso no Movidesk!:tada:\n\nVocê pode acompanhar os detalhes da sua solicitação aqui: <${linkMovidesk}|${ticket.protocol}>\n\nObrigado por reportar o problema! Nossa equipe irá tratá-lo por lá. `,
+                text: `Olá <@${messageAuthorId}> :wave::skin-tone-4:\n\nSeu ticket foi criado com sucesso no Movidesk !:tada:\n\nVocê pode acompanhar os detalhes da sua solicitação aqui: <${linkMovidesk}|${ticket.protocol}>\n\nObrigado por reportar o problema! Nossa equipe irá tratá-lo por lá. `,
             })
 
             console.log("Ticket completo:", JSON.stringify(ticket, null, 2))
@@ -78,10 +78,7 @@ export function registerTicketReaction(app) {
             if (files.length > 0) {
                 await Promise.all(files.map((f) => uploadSlackFileToMovidesk(ticket.id, f)))
             }
-
-
             
-
 
         } catch (error) {
             console.error("Erro ao criar o ticket:", error)

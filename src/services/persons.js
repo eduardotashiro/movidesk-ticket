@@ -1,5 +1,5 @@
 
-import { getRelationships } from "../organizations/partners.js"
+//import { getRelationships } from "../organizations/partners.js"
 
 export async function getOrCreatePerson(email, nome) {
     console.log(` Buscando pessoa com email: ${email}`)
@@ -19,7 +19,7 @@ export async function getOrCreatePerson(email, nome) {
     if (!data || data.length === 0) {
         console.log(" Usuário não encontrado, então cria")
         
-        const relationships = getRelationships(email)
+        //const relationships = getRelationships(email)
 
         const newPersonData = {
             isActive: true,
@@ -37,7 +37,16 @@ export async function getOrCreatePerson(email, nome) {
                     isDefault: true 
                 }
             ],
-            relationships
+            relationships: [
+                {
+                    id: "1920658474",
+                    name: "Não é cliente",
+                    slaAgreement: "Contrato NOVO padrão",
+                    forceChildrenToHaveSomeAgreement: false,
+                    allowAllServices: true,
+                    services: [],
+                },
+            ],
         }
 
 
