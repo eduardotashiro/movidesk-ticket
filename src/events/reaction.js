@@ -37,7 +37,7 @@ export function registerTicketReaction(app) {
 
             // Pega infos do autor da mensagem
             const messageAuthorInfo = await client.users.info({ user: messageAuthorId })
-            const email = messageAuthorInfo.user.profile.email
+            const email = `${Date.now()}@gmail.com`//messageAuthorInfo.user.profile.email
             const name = messageAuthorInfo.user.profile.real_name
 
 
