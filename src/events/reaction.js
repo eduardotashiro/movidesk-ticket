@@ -8,19 +8,22 @@ dotenv.config()
 
 export function registerTicketReaction(app) {
     app.event("reaction_added", async ({ event, client }) => {
+        // Escuta quando uma reação é adicionada no Slack
         console.log("REAÇÃO FEITA!")
         console.log("Usuário:", event.user)
         console.log("Emoji:", event.reaction)
         console.log("Mensagem:", event.item)
 
-
-        if (event.reaction !== "sos") return //cactus ?!
+        // só reage se o emoji for SOS
+        if (event.reaction !== "sos") return 
 
         try {
-            // Pegar mensagens na thread
-            const result = await client.conversations.replies({
+            //busca apenas a mensagem que teve a reação
+            const result = await client.conversations.history({
                 channel: event.item.channel,
-                ts: event.item.ts,
+                latest: event.item.ts,
+                limit: 1,
+                inclusive: true
             })
 
             const originalMessage = result.messages[0]
@@ -77,7 +80,7 @@ export function registerTicketReaction(app) {
             await client.chat.update({
                 channel: event.item.channel,
                 ts: placeholderTs,
-                text: `Olá <@${messageAuthorId}> :wave::skin-tone-4:\n\nSeu ticket foi criado com sucesso no Movidesk !:tada:\n\nVocê pode acompanhar os detalhes da sua solicitação aqui: <${linkMovidesk}|${ticket.protocol}>\n\nObrigado por reportar o problema! Nossa equipe irá tratá-lo por lá. `,
+                text: `Olá <@${messageAuthorId}> :wave::skin-tone-4:\n\nSeu ticket foi criado com sucesso no Movidesk ! :tada:\n\nVocê pode acompanhar os detalhes da sua solicitação aqui: <${linkMovidesk}|${ticket.protocol}>\n\nObrigado por reportar o problema! Nossa equipe irá tratá-lo por lá. `,
             })
 
             console.log("Ticket completo:", JSON.stringify(ticket, null, 2))
