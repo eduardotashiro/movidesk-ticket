@@ -1,10 +1,10 @@
 import { createTicket } from "../services/movidesk.js"
 import { uploadSlackFileToMovidesk } from "../utils/uploadFile.js"
 import { getOrCreatePerson } from "../services/persons.js"
-
 import dotenv from "dotenv"
 
 dotenv.config()
+
 
 export function registerTicketReaction(app) {
     app.event("reaction_added", async ({ event, client }) => {
@@ -24,9 +24,20 @@ export function registerTicketReaction(app) {
             })
 
             const originalMessage = result.messages[0]
-            const text = originalMessage.text
+            let text = originalMessage.text
             const files = originalMessage.files || []
             const messageAuthorId = originalMessage.user
+
+            //
+            const mention = /<@([A-Z0-9]+)>/g
+            const matches = [...text.matchAll(mention)]
+
+            for (const match of matches) {
+                const userId = match[1]
+                const userInfo = await client.users.info({ user: userId })
+                const realName = userInfo.user.profile.real_name
+                text = text.replace(match[0], realName)
+            }
 
             const placeholder = await client.chat.postMessage({
                 channel: event.item.channel,
@@ -51,9 +62,11 @@ export function registerTicketReaction(app) {
             const threadContext = `<a href="${threadLink}" target="_blank">Abrir thread no Slack</a>`
 
 
+
+
             const ticket = await createTicket({
                 clientId: movideskId,
-                assunto: `Ticket via Slack: ${text.substring(0,69)}`,
+                assunto: `Ticket via Slack: ${text.substring(0, 69)}`,
                 descricao: text,
                 servico: null,
                 threadContext,
@@ -78,7 +91,7 @@ export function registerTicketReaction(app) {
             if (files.length > 0) {
                 await Promise.all(files.map((f) => uploadSlackFileToMovidesk(ticket.id, f)))
             }
-            
+
 
         } catch (error) {
             console.error("Erro ao criar o ticket:", error)
