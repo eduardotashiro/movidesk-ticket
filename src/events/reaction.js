@@ -9,10 +9,12 @@ dotenv.config()
 export function registerTicketReaction(app) {
     app.event("reaction_added", async ({ event, client }) => {
         // Escuta quando uma reação é adicionada no Slack
-        console.log("REAÇÃO FEITA!")
-        console.log("Usuário:", event.user)
+
+        console.log("----REAÇÃO FEITA!-----")
+        console.log("Usuário:", event.user  )
         console.log("Emoji:", event.reaction)
-        console.log("Mensagem:", event.item)
+        console.log("Mensagem:", event.item )
+        console.log("----------------------")
 
         // só reage se o emoji for SOS
         if (event.reaction !== "sos") return 
