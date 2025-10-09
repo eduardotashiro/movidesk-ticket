@@ -20,12 +20,11 @@ export function registerTicketReaction(app) {
         if (event.reaction !== "sos") return 
 
         try {
-            //busca apenas a mensagem que teve a reação
-            const result = await client.conversations.history({
+            
+            // Pega todas as mensagens da thread... preciso descobrir como pegar só a reagida
+            const result = await client.conversations.replies({
                 channel: event.item.channel,
-                latest: event.item.ts,
-                limit: 1,
-                inclusive: true
+                ts: event.item.ts,
             })
 
             const originalMessage = result.messages[0]
@@ -44,17 +43,27 @@ export function registerTicketReaction(app) {
                 text = text.replace(match[0], realName)
             }
 
-            // 'Placeholder' na thread enquanto cria o ticket, feedback para quem reage ficar na paz, só de arquivos não se cria
-            if (!text.trim()){
+            // apenas arquivo não cria ticket
+            if ((!text || !text.trim()) && files.length > 0){
             await client.chat.postMessage({
                 channel: event.item.channel,
                 thread_ts: event.item.ts,
-                text: `Olá <@${messageAuthorId}>,\n\nInfelizmente não consigo criar ticket apenas com arquivos, precisa escrever o problema junto :sweat_smile:`
-            }) 
+                text: `Olá <@${messageAuthorId}>,\n\nInfelizmente *não* consigo criar Ticket apenas com arquivos, precisa escrever o problema junto :sweat_smile:`
+            })  
 
             return
 
-        } 
+            //apenas emoji não cria ticket 
+        } else if (/:([a-z0-9_+-]+):/gi.test(text)){
+             await client.chat.postMessage({
+                channel: event.item.channel,
+                thread_ts: event.item.ts,
+                text: `Olá <@${messageAuthorId}>,\n\nInfelizmente *não* consigo criar Ticket apenas com emojis, precisa escrever o problema junto :sweat_smile:`
+            })  
+
+            return
+
+        }
 
             const placeholder = await client.chat.postMessage({
                 channel: event.item.channel,
