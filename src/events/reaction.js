@@ -31,7 +31,7 @@ export function registerTicketReaction(app) {
             const files = originalMessage.files || []
             const messageAuthorId = originalMessage.user
 
-            //
+            // Substitui menções <@ID> pelo nome real quando for para o movidesk
             const mention = /<@([A-Z0-9]+)>/g
             const matches = [...text.matchAll(mention)]
 
@@ -42,6 +42,18 @@ export function registerTicketReaction(app) {
                 text = text.replace(match[0], realName)
             }
 
+            // 'Placeholder' na thread enquanto cria o ticket, feedback para quem reage ficar na paz, só de arquivos não se cria
+            if (!text.trim()){
+            await client.chat.postMessage({
+                channel: event.item.channel,
+                thread_ts: event.item.ts,
+                text: `Olá <@${messageAuthorId}>,\n\nInfelizmente não consigo criar ticket apenas com arquivos, precisa escrever o problema junto :sweat_smile:`
+            }) 
+
+            return
+
+        } 
+
             const placeholder = await client.chat.postMessage({
                 channel: event.item.channel,
                 thread_ts: event.item.ts,
@@ -50,23 +62,22 @@ export function registerTicketReaction(app) {
 
             const placeholderTs = placeholder.ts
 
-            // Pega infos do autor da mensagem
+
+             // Pega info do autor 
             const messageAuthorInfo = await client.users.info({ user: messageAuthorId })
             const email = messageAuthorInfo.user.profile.email //`${Date.now()}@gmail.com` 
             const name = messageAuthorInfo.user.profile.real_name
 
-
+            //busca, se der false, cria ! 
             const movideskId = await getOrCreatePerson(email, name)
 
-
+            // Link da thread para enviar p/ movidesk
             const threadOrigin = result.messages[0].ts
             const tsForLink = threadOrigin.replace(".", "")
             const threadLink = `${process.env.URL_THREAD_LINK}/${event.item.channel}/p${tsForLink}`
             const threadContext = `<a href="${threadLink}" target="_blank">Abrir thread no Slack</a>`
 
-
-
-
+            // Cria o ticket no Movidesk
             const ticket = await createTicket({
                 clientId: movideskId,
                 assunto: `Ticket via Slack: ${text.substring(0, 69)}`,
@@ -75,7 +86,7 @@ export function registerTicketReaction(app) {
                 threadContext,
             })
 
-            // Responder na thread com link do ticket
+            // Atualiza placeholder com link do ticket
             const linkMovidesk = `${process.env.URL_TICKET_LINK}${ticket.protocol}`
             await client.chat.update({
                 channel: event.item.channel,
@@ -90,7 +101,7 @@ export function registerTicketReaction(app) {
             console.log(fullTicket)
 
 
-            // Upload de arquivos
+            // Upload de arquivos, se tiver
             if (files.length > 0) {
                 await Promise.all(files.map((f) => uploadSlackFileToMovidesk(ticket.id, f)))
             }
