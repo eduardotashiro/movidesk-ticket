@@ -4,6 +4,7 @@ dotenv.config()
 
 export async function createTicket({ clientId, assunto, descricao, threadContext }) { 
 
+    //payload para enviar p/ movidesk
     const ticketBody = {
         type: 2,
         subject: assunto,
@@ -46,13 +47,14 @@ export async function createTicket({ clientId, assunto, descricao, threadContext
         ]
     }
 
-
+    // Chama API do Movidesk
     const response = await fetch(`${process.env.URL_CREATE_TICKET}?token=${process.env.MOVIDESK_TOKEN}`, {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(ticketBody),
     })
 
+    // Lida com erro de API
     if (!response.ok) {
         const text = await response.text()
         console.error(`Movidesk API retornou ${response.status}: ${text}`)

@@ -15,7 +15,7 @@ export async function getOrCreatePerson(email, nome) {
     const data = await response.json()
     console.log(" Dados retornados da busca:", JSON.stringify(data, null, 2))
 
-    
+    // Se não existir, cria
     if (!data || data.length === 0) {
         console.log(" Usuário não encontrado, então cria")
         
@@ -87,10 +87,12 @@ export async function getOrCreatePerson(email, nome) {
         }
     }
 
-
+    // Usuário existe, pega info
     const person = data[0]
     console.log(` Usuário encontrado: ${person.id}, Ativo: ${person.isActive}`)
     
+
+    // Reativa se estiver inativo
     if (!person.isActive) {
         console.log(" Reativa usuário...")
         
@@ -113,5 +115,6 @@ export async function getOrCreatePerson(email, nome) {
     }
 
     console.log(`Retornando ID: ${person.id}`)
+    
     return person.id
 }
