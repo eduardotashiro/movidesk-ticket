@@ -21,7 +21,7 @@ export function registerTicketReaction(app) {
 
         try {
             
-            // Pega todas as mensagens da thread... preciso descobrir como pegar só a reagida
+            //pega mensagem na thread
             const result = await client.conversations.replies({
                 channel: event.item.channel,
                 ts: event.item.ts,
@@ -43,25 +43,27 @@ export function registerTicketReaction(app) {
                 text = text.replace(match[0], realName)
             }
 
-            // apenas arquivo não cria ticket
+            // apenas arquivo não cria ticket 
             if ((!text || !text.trim()) && files.length > 0){
             await client.chat.postMessage({
                 channel: event.item.channel,
                 thread_ts: event.item.ts,
-                text: `Olá <@${messageAuthorId}>,\n\nInfelizmente *não* consigo criar Ticket apenas com arquivos, precisa escrever o problema junto :sweat_smile:`
+                text: `Olá <@${messageAuthorId}>,\n\nInfelizmente *não* consigo criar Ticket apenas com arquivos... :sweat_smile:`
             })  
 
             return
 
             //apenas emoji não cria ticket 
-        } else if (/:([a-z0-9_+-]+):/gi.test(text)){
+        } else if (/^(:[a-z0-9_+-]+:\s*)+$/gi.test(text.trim())){
              await client.chat.postMessage({
                 channel: event.item.channel,
                 thread_ts: event.item.ts,
-                text: `Olá <@${messageAuthorId}>,\n\nInfelizmente *não* consigo criar Ticket apenas com emojis, precisa escrever o problema junto :sweat_smile:`
+                text: `Olá <@${messageAuthorId}>,\n\nInfelizmente *não* consigo criar Ticket apenas com emojis... :sweat_smile:`
             })  
 
+
             return
+
 
         }
 
