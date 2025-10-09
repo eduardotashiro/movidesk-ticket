@@ -43,4 +43,4 @@ npm start
 
 ---
 
-***MIT*** © **[Eduardo Tashiro]()**
+***MIT*** © **[Eduardo Tashiro](https://github.com/eduardotashiro)**
