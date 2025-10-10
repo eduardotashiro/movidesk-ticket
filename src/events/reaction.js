@@ -61,9 +61,7 @@ export function registerTicketReaction(app) {
                 text: `Olá <@${messageAuthorId}>,\n\nInfelizmente *não* consigo criar Ticket apenas com emojis... :sweat_smile:`
             })  
 
-
             return
-
 
         }
 
@@ -78,7 +76,7 @@ export function registerTicketReaction(app) {
 
              // Pega info do autor 
             const messageAuthorInfo = await client.users.info({ user: messageAuthorId })
-            const email = messageAuthorInfo.user.profile.email //`${Date.now()}@gmail.com` 
+            const email = messageAuthorInfo.user.profile.email //`${Date.now()}@teste.com` 
             const name = messageAuthorInfo.user.profile.real_name
 
             //busca, se der false, cria ! 

@@ -1,10 +1,11 @@
+import { getRelationships } from "../organization/relationships.js"
 
-//import { getRelationships } from "../organizations/partners.js"
+export async function getOrCreatePerson(email, name) {
 
-export async function getOrCreatePerson(email, nome) {
+
     console.log(` Buscando pessoa com email: ${email}`)
     
-    
+
     const searchUrl = `${process.env.URL_PERSON}?token=${process.env.MOVIDESK_TOKEN}&$filter=emails/any(e: e/email eq '${email}')`
 
 
@@ -19,14 +20,14 @@ export async function getOrCreatePerson(email, nome) {
     if (!data || data.length === 0) {
         console.log(" Usuário não encontrado, então cria")
         
-        //const relationships = getRelationships(email)
+        const relationships = getRelationships(email)
 
         const newPersonData = {
             isActive: true,
             personType: 1,
             profileType: 2,
             accessProfile: "Partner",
-            businessName: nome,
+            businessName: name,
             userName: email, 
             cultureId: "pt-BR",
             timeZoneId: "America/Sao_Paulo",
@@ -37,16 +38,7 @@ export async function getOrCreatePerson(email, nome) {
                     isDefault: true 
                 }
             ],
-            relationships: [
-                {
-                    id: "1920658474",
-                    name: "Não é cliente",
-                    slaAgreement: "Contrato NOVO padrão",
-                    forceChildrenToHaveSomeAgreement: false,
-                    allowAllServices: true,
-                    services: [],
-                },
-            ],
+            relationships   
         }
 
 
@@ -114,7 +106,7 @@ export async function getOrCreatePerson(email, nome) {
         console.log(" Usuário reativado!")
     }
 
-    console.log(`Retornando ID: ${person.id}`)
-    
+    console.log(`Movidesk - Pessoa vinculada: ${email} ID: ${person.id}`)
+
     return person.id
 }
