@@ -102,7 +102,7 @@ export function registerTicketReaction(app) {
             await client.chat.update({
                 channel: event.item.channel,
                 ts: placeholderTs,
-                text: `Olá <@${messageAuthorId}> :wave::skin-tone-4:\nSeu ticket foi criado na *Central de Ajuda Tuna*. Acompanhe sua solicitação em: <${linkMovidesk}|${ticket.protocol}>.\n\`\`\`Se for seu primeiro acesso, acesse "Obter uma senha" na página de login.\`\`\`\nAgradecemos sua atenção.`,
+                text: `Olá <@${messageAuthorId}> :wave::skin-tone-4:\n\nSeu ticket foi criado na *Central de Ajuda Tuna*.  Acompanhe sua solicitação em: <${linkMovidesk}|${ticket.protocol}>.\n\n\`\`\`Se for seu primeiro acesso, acesse "Obter uma senha" na página de login.\`\`\`\nAgradecemos sua atenção.`,
             })
 
             console.log("Ticket completo:", JSON.stringify(ticket, null, 2))
