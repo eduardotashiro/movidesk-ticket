@@ -1,3 +1,4 @@
+import figlet from "figlet"
 import pkg from "@slack/bolt"
 const { App } = pkg
 
@@ -15,3 +16,12 @@ dotenv.config()
 import { registerTicketReaction } from "./events/reaction.js"
 
 registerTicketReaction(app)
+
+
+figlet("TUNA - SUPORTE", function (e, data) {
+  if (e) {
+    console.log("não gerou ASCII :(")
+    return
+  }
+  console.log(data)
+})
