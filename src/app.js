@@ -18,7 +18,7 @@ import { registerTicketReaction } from "./events/reaction.js"
 registerTicketReaction(app)
 
 
-figlet("TUNA - SUPORTE", function (e, data) {
+figlet("TUNA   x   SUPORTE ", function (e, data) {
   if (e) {
     console.log("não gerou ASCII :(")
     return
