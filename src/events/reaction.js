@@ -48,7 +48,7 @@ export function registerTicketReaction(app) {
             await client.chat.postMessage({
                 channel: event.item.channel,
                 thread_ts: event.item.ts,
-                text: `Olá <@${messageAuthorId}>,\n\nInfelizmente *não* consigo criar Ticket apenas com arquivos... :sweat_smile:`
+                text: `Olá <@${messageAuthorId}>,\n\AInda não consigo criar Ticket no Suporte apenas com arquivos. :sweat_smile:\n\nPor favor tente novamente em uma mensagem que contenha textos também.`
             })  
 
             return
