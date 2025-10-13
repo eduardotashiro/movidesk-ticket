@@ -58,7 +58,7 @@ export function registerTicketReaction(app) {
              await client.chat.postMessage({
                 channel: event.item.channel,
                 thread_ts: event.item.ts,
-                text: `Olá <@${messageAuthorId}>,\n\nInfelizmente *não* consigo criar Ticket apenas com emojis... :sweat_smile:`
+                text: `Olá <@${messageAuthorId}>,\n\nAinda não consigo criar Ticket no Suporte apenas com emojis. :sweat_smile:\n\nPor favor tente novamente em uma mensagem que contenha textos também.`
             })  
 
             return
