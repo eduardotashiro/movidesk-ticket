@@ -11,16 +11,16 @@ export function registerTicketReaction(app) {
         // Escuta quando uma reação é adicionada no Slack
 
         console.log("----REAÇÃO FEITA!-----")
-        console.log("Usuário:", event.user  )
+        console.log("Usuário:", event.user)
         console.log("Emoji:", event.reaction)
-        console.log("Mensagem:", event.item )
+        console.log("Mensagem:", event.item)
         console.log("----------------------")
 
         // só reage se o emoji for SOS
-        if (event.reaction !== "sos") return 
+        if (event.reaction !== "sos") return
 
         try {
-            
+
             //pega mensagem na thread
             const result = await client.conversations.replies({
                 channel: event.item.channel,
@@ -44,26 +44,26 @@ export function registerTicketReaction(app) {
             }
 
             // apenas arquivo não cria ticket 
-            if ((!text || !text.trim()) && files.length > 0){
-            await client.chat.postMessage({
-                channel: event.item.channel,
-                thread_ts: event.item.ts,
-                text: `Olá <@${messageAuthorId}>,\n\nAinda não consigo criar Ticket no Suporte apenas com arquivos. :sweat_smile:\n\nPor favor tente novamente em uma mensagem que contenha textos também.`
-            })  
+            if ((!text || !text.trim()) && files.length > 0) {
+                await client.chat.postMessage({
+                    channel: event.item.channel,
+                    thread_ts: event.item.ts,
+                    text: `Olá <@${messageAuthorId}>,\n\nAinda não consigo criar Ticket no Suporte apenas com arquivos. :sweat_smile:\n\nPor favor tente novamente em uma mensagem que contenha textos também.`
+                })
 
-            return
+                return
 
-            //apenas emoji não cria ticket 
-        } else if (/^(:[a-z0-9_+-]+:\s*)+$/gi.test(text.trim())){
-             await client.chat.postMessage({
-                channel: event.item.channel,
-                thread_ts: event.item.ts,
-                text: `Olá <@${messageAuthorId}>,\n\nAinda não consigo criar Ticket no Suporte apenas com emojis. :sweat_smile:\n\nPor favor tente novamente em uma mensagem que contenha textos também.`
-            })  
+                //apenas emoji não cria ticket 
+            } else if (/^(:[a-z0-9_+-]+:\s*)+$/gi.test(text.trim())) {
+                await client.chat.postMessage({
+                    channel: event.item.channel,
+                    thread_ts: event.item.ts,
+                    text: `Olá <@${messageAuthorId}>,\n\nAinda não consigo criar Ticket no Suporte apenas com emojis. :sweat_smile:\n\nPor favor tente novamente em uma mensagem que contenha textos também.`
+                })
 
-            return
+                return
 
-        }
+            }
 
             const placeholder = await client.chat.postMessage({
                 channel: event.item.channel,
@@ -74,7 +74,7 @@ export function registerTicketReaction(app) {
             const placeholderTs = placeholder.ts
 
 
-             // Pega info do autor 
+            // Pega info do autor 
             const messageAuthorInfo = await client.users.info({ user: messageAuthorId })
             const email = messageAuthorInfo.user.profile.email //`${Date.now()}@teste.com` 
             const name = messageAuthorInfo.user.profile.real_name
@@ -82,8 +82,11 @@ export function registerTicketReaction(app) {
             //busca, se der false, cria ! 
             const movideskId = await getOrCreatePerson(email, name)
 
+            console.log("msg dentro da thread", originalMessage.ts)
+            console.log("msg raiz da thread:", originalMessage.thread_ts)
+
             // Link da thread para enviar p/ movidesk
-            const threadOrigin = result.messages[0].ts
+            const threadOrigin = originalMessage.thread_ts || originalMessage.ts  //result.messages[0].ts
             const tsForLink = threadOrigin.replace(".", "")
             const threadLink = `${process.env.URL_THREAD_LINK}/${event.item.channel}/p${tsForLink}`
             const threadContext = `<a href="${threadLink}" target="_blank">Abrir thread no Slack</a>`
