@@ -76,8 +76,8 @@ export function registerTicketReaction(app) {
 
             // Pega info do autor 
             const messageAuthorInfo = await client.users.info({ user: messageAuthorId })
-            const email = 'eduardogaia854@egmail.com' //messageAuthorInfo.user.profile.email //`${Date.now()}@teste.com` 
-            const name = messageAuthorInfo.user.profile.real_name
+            const email = 'eduardogaia854@gmail.com' //messageAuthorInfo.user.profile.email //`${Date.now()}@teste.com` 
+            const name = messageAuthorInfo.user.profile.real_name //
 
             //busca, se der false, cria ! 
             const movideskId = await getOrCreatePerson(email, name)
