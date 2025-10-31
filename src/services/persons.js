@@ -6,18 +6,23 @@ export async function getOrCreatePerson(email, name) {
     console.log(` Buscando pessoa com email: ${email}`)
     
 
-    const searchUrl = `${process.env.URL_PERSON}?token=${process.env.MOVIDESK_TOKEN}&$filter=emails/any(e: e/email eq '${email}')`
+    const searchEmailUrl = `${process.env.URL_PERSON}?token=${process.env.MOVIDESK_TOKEN}&$filter=emails/any(e: e/email eq '${email}')`
+    const searchUserName = `${process.env.URL_PERSON}?token=${process.env.MOVIDESK_TOKEN}&$filter=userName eq '${email}'`
 
-
-    const response = await fetch(searchUrl)
-    console.log(` Status da busca: ${response.status}`)
+    const responseEmailUrl = await fetch(searchEmailUrl)
+    const responseUserNameUrl = await fetch(searchUserName)
+    
+    console.log(` Status da busca email: ${responseEmailUrl.status}`)
+    console.log(` Status da busca name: ${responseUserNameUrl.status}`)
     
 
-    const data = await response.json()
-    console.log(" Dados retornados da busca:", JSON.stringify(data, null, 2))
+    const emailData = await responseEmailUrl.json()
+    const userNameData = await responseUserNameUrl.json()
+    console.log(" Dados retornados da busca email:", JSON.stringify(emailData, null, 2))
+    console.log(" Dados retornados da busca userName:", JSON.stringify(userNameData, null, 2))
 
     // Se não existir, cria
-    if (!data || data.length === 0) {
+    if ((!emailData || emailData.length=== 0) && (!userNameData || userNameData.length === 0)) {//ordem de precedencia
         console.log(" Usuário não encontrado, então cria")
         
         const relationships = getRelationships(email)
@@ -28,13 +33,13 @@ export async function getOrCreatePerson(email, name) {
             profileType: 2,
             accessProfile: "Partner",
             businessName: name,
-            userName: email, 
+            userName: email, //1º buscar
             cultureId: "pt-BR",
             timeZoneId: "America/Sao_Paulo",
             emails: [
                 { 
                     emailType: "Pessoal", 
-                    email: email, 
+                    email: email, //2º buscar
                     isDefault: true 
                 }
             ],
@@ -80,7 +85,7 @@ export async function getOrCreatePerson(email, name) {
     }
 
     // Usuário existe, pega info
-    const person = data[0]
+    const person = emailData[0] || userNameData[0]
     console.log(` Usuário encontrado: ${person.id}, Ativo: ${person.isActive}`)
     
 
