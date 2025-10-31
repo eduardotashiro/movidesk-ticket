@@ -4,27 +4,61 @@ export async function getOrCreatePerson(email, name) {
 
 
     console.log(` Buscando pessoa com email: ${email}`)
-    
+
 
     const searchEmailUrl = `${process.env.URL_PERSON}?token=${process.env.MOVIDESK_TOKEN}&$filter=emails/any(e: e/email eq '${email}')`
     const searchUserName = `${process.env.URL_PERSON}?token=${process.env.MOVIDESK_TOKEN}&$filter=userName eq '${email}'`
 
     const responseEmailUrl = await fetch(searchEmailUrl)
     const responseUserNameUrl = await fetch(searchUserName)
-    
+
     console.log(` Status da busca email: ${responseEmailUrl.status}`)
     console.log(` Status da busca name: ${responseUserNameUrl.status}`)
-    
+
 
     const emailData = await responseEmailUrl.json()
     const userNameData = await responseUserNameUrl.json()
     console.log(" Dados retornados da busca email:", JSON.stringify(emailData, null, 2))
     console.log(" Dados retornados da busca userName:", JSON.stringify(userNameData, null, 2))
 
+    //atualiza campo email
+    if (userNameData.length > 0 && (!emailData || emailData.length === 0)) {
+        console.log(" Atualiza campo email com o email capturado...")
+
+        let personId = userNameData[0].id;
+
+        const bodyUpdate = {
+            emails: [
+                {
+                    emailType: "Pessoal",
+                    email: email,
+                    isDefault: true
+                }
+            ]
+        }
+
+        const updateEmailResponse = await fetch(
+            `${process.env.MOVIDESK_API}/public/v1/persons/?token=${process.env.MOVIDESK_TOKEN}&id=${personId}`,
+            {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(bodyUpdate),
+            }
+        )
+
+        console.log(`Status da atualização: ${updateEmailResponse.status}`)
+
+        if (!updateEmailResponse.ok) {
+            throw new Error("Erro ao atualizar email do usuário no Movidesk")
+        }
+
+        console.log(" Campo email do usuario atualizado!")
+    }
+
     // Se não existir, cria
-    if ((!emailData || emailData.length=== 0) && (!userNameData || userNameData.length === 0)) {//ordem de precedencia
+    if ((!emailData || emailData.length === 0) && (!userNameData || userNameData.length === 0)) {//ordem de precedencia
         console.log(" Usuário não encontrado, então cria")
-        
+
         const relationships = getRelationships(email)
 
         const newPersonData = {
@@ -37,18 +71,18 @@ export async function getOrCreatePerson(email, name) {
             cultureId: "pt-BR",
             timeZoneId: "America/Sao_Paulo",
             emails: [
-                { 
-                    emailType: "Pessoal", 
+                {
+                    emailType: "Pessoal",
                     email: email, //2º buscar
-                    isDefault: true 
+                    isDefault: true
                 }
             ],
-            relationships   
+            relationships
         }
 
 
         console.log(" Enviando dados para criação:", JSON.stringify(newPersonData, null, 2))
-        
+
 
         try {
             const newPersonResponse = await fetch(
@@ -62,7 +96,7 @@ export async function getOrCreatePerson(email, name) {
 
 
             console.log(` Status da criação: ${newPersonResponse.status}`)
-            
+
 
             if (!newPersonResponse.ok) {
                 const errorText = await newPersonResponse.text()
@@ -76,7 +110,7 @@ export async function getOrCreatePerson(email, name) {
             console.log(" Usuário criado com ID:", newPerson.id)
             console.log(" Usuário criado com ID completo:", JSON.stringify(newPerson))
             return newPerson.id
-            
+
 
         } catch (error) {
             console.error(" ERRO NA REQUISIÇÃO:", error.message)
@@ -87,27 +121,27 @@ export async function getOrCreatePerson(email, name) {
     // Usuário existe, pega info
     const person = emailData[0] || userNameData[0]
     console.log(` Usuário encontrado: ${person.id}, Ativo: ${person.isActive}`)
-    
+
 
     // Reativa se estiver inativo
     if (!person.isActive) {
         console.log(" Reativa usuário...")
-        
+
         const activateResponse = await fetch(
             `${process.env.MOVIDESK_API}/public/v1/persons/?token=${process.env.MOVIDESK_TOKEN}&id=${person.id}`,
             {
-                method: "PATCH", 
+                method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ isActive: true }),
             }
         )
-        
+
         console.log(`Status da reativação: ${activateResponse.status}`)
-        
+
         if (!activateResponse.ok) {
             throw new Error("Erro ao reativar usuário no Movidesk")
         }
-        
+
         console.log(" Usuário reativado!")
     }
 
