@@ -19,7 +19,7 @@ dotenv.config()
         type: "header",
         text: {
           type: "plain_text",
-          text:  `📊 Total de Tickets criados: 780 `, //${ticketCount}
+          text:  `:tuna-bot: Total de Tickets criados: 780 `, //${ticketCount}
           emoji: true,
         },
       },
