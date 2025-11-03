@@ -30,6 +30,6 @@ dotenv.config()
   },
 });
   } catch (error) {
-    console.error("Erro ao atualizar Home Tab:", error);
+    console.warn("Opa, não conseguimos baixar o banner, mas relaxa, não vai crashar");
   }
 })}
