@@ -11,11 +11,12 @@ dotenv.config()
     signingSecret: process.env.SLACK_SIGNING_SECRET    
 })
 
-// importa os handlers e passa o app
+
 
 import { registerTicketReaction } from "./events/reaction.js"
-
+import { homeTab } from "./homeTab/appHome.js"
 registerTicketReaction(app)
+homeTab(app)
 
 
 figlet("TUNA   x   SUPORTE ", function (e, data) {
