@@ -1,4 +1,4 @@
-import { ticketCounter } from "../db/dbQueries.js"
+import { showMetrics } from "../db/dbQueries.js"
 import dotenv from "dotenv"
 dotenv.config()
 
