@@ -22,7 +22,7 @@ export function registerTicketReaction(app) {
 
         try {
             //incremeta o contador no bd
-            ticketCounter()
+            await ticketCounter()
             
 
             //pega mensagem na thread
