@@ -22,7 +22,7 @@ export async function showMetrics() {
       SELECT total_tickets
       FROM contagem_ticket_global
       WHERE id = 1;`)
-        return res.rows[0].total_tickets
+        return res.rows[0]
     } catch (error) {
         console.error("Erro ao buscar métricas:", error)
         return null

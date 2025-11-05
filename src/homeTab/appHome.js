@@ -6,7 +6,8 @@ dotenv.config()
 export function homeTab(app) {
   app.event("app_home_opened", async ({ event, client }) => {
 
-    const ticketCount = await showMetrics()
+    const metrics = await showMetrics()
+    const ticketCount= metrics.total_tickets
 
     try {
       await client.views.publish({
