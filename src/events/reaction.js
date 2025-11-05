@@ -1,6 +1,7 @@
 import { createTicket } from "../services/movidesk.js"
 import { uploadSlackFileToMovidesk } from "../utils/uploadFile.js"
 import { getOrCreatePerson } from "../services/persons.js"
+import { ticketCounter } from "../db/dbQueries.js"
 import dotenv from "dotenv"
 
 dotenv.config()
@@ -20,6 +21,9 @@ export function registerTicketReaction(app) {
         if (event.reaction !== "sos") return
 
         try {
+            //incremeta o contador no bd
+            ticketCounter()
+            
 
             //pega mensagem na thread
             const result = await client.conversations.replies({
@@ -119,6 +123,7 @@ export function registerTicketReaction(app) {
             if (files.length > 0) {
                 await Promise.all(files.map((f) => uploadSlackFileToMovidesk(ticket.id, f)))
             }
+
 
 
         } catch (error) {
