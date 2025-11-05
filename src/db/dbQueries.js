@@ -5,7 +5,7 @@ export async function ticketCounter() {
 
     try {
         const res = await pool.query(
-        `UPDATE contagem_ticket_global
+        `UPDATE contagem_tickets_global
         SET total_tickets = total_tickets + 1
         WHERE id = 1;`)
         return res.rows
@@ -20,7 +20,7 @@ export async function showMetrics() {
     try {
       const res = await pool.query(`
       SELECT total_tickets
-      FROM contagem_ticket_global
+      FROM contagem_tickets_global
       WHERE id = 1;`)
         return res.rows[0]
     } catch (error) {
