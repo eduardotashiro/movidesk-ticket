@@ -22,8 +22,8 @@ export function registerTicketReaction(app) {
 
         try {
             //incremeta o contador no bd
-            await ticketCounter()
-            
+          //  await ticketCounter()
+
 
             //pega mensagem na thread
             const result = await client.conversations.replies({
@@ -36,7 +36,7 @@ export function registerTicketReaction(app) {
             const files = originalMessage.files || []
             const messageAuthorId = originalMessage.user
 
-            // Substitui menções <@ID> pelo nome real quando for para o movidesk
+            // substitui menções <@ID> pelo nome real quando for para o movidesk
             const mention = /<@([A-Z0-9]+)>/g
             const matches = [...text.matchAll(mention)]
 
@@ -47,7 +47,7 @@ export function registerTicketReaction(app) {
                 text = text.replace(match[0], realName)
             }
 
-            // apenas arquivo não cria ticket 
+            // apenas arquivo n cria ticket
             if ((!text || !text.trim()) && files.length > 0) {
                 await client.chat.postMessage({
                     channel: event.item.channel,
@@ -89,11 +89,28 @@ export function registerTicketReaction(app) {
             console.log("msg dentro da thread", originalMessage.ts)
             console.log("msg raiz da thread:", originalMessage.thread_ts)
 
-            // Link da thread para enviar p/ movidesk
-            const threadOrigin = originalMessage.thread_ts || originalMessage.ts  //result.messages[0].ts
-            const tsForLink = threadOrigin.replace(".", "")
-            const threadLink = `${process.env.URL_THREAD_LINK}/${event.item.channel}/p${tsForLink}`
-            const threadContext = `<a href="${threadLink}" target="_blank">Abrir thread no Slack</a>`
+             /*************/
+             
+            let threadContext ;
+
+            if(originalMessage.thread_ts && originalMessage.thread_ts !== originalMessage.ts){
+              
+            const messageTsFormatted = originalMessage.ts.replace('.', '').padEnd(16, '0'); //preenche o 17 com 0 pq o slack ta chato
+              
+            const threadTsFormatted = originalMessage.thread_ts.replace('.', '').padEnd(16, '0');//preenche o 17 com 0 pq o slack ta chato
+  
+            let threadLink = `${process.env.URL_THREAD_LINK}/${event.item.channel}/p${messageTsFormatted}?thread_ts=${threadTsFormatted}&cid=${event.item.channel}`;
+
+             threadContext = `<a href="${threadLink}"target="_blank">Abrir Thread no Slack</a>`;
+
+             } else {
+
+             const t = `${process.env.URL_THREAD_LINK}/${event.item.channel}/p${originalMessage.ts.replace('.', '').padEnd(16, '0')}`
+               threadContext = `<a href="${t}"target="_blank">Abrir Thread no Slack</a>`;
+             }
+                    
+                              
+             /*************/
 
             // Cria o ticket no Movidesk
             const ticket = await createTicket({
