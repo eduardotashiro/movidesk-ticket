@@ -109,6 +109,15 @@ export function getRelationships(email) {
       }
       break
 
+      case "tuna.uy":
+      relationship = {
+        id: process.env.TUNA_ID,
+        name: process.env.TUNA_NAME,
+        slaAgreement: process.env.TUNA_SLA,
+        allowAllServices: true,
+      }
+      break
+
     default:
       relationship = {
         id: process.env.DEFAULT_ID,
