@@ -1,3 +1,4 @@
+import { config } from "../config/env";
 
 export async function uploadSlackFileToMovidesk(ticketId, file) {
     
@@ -5,7 +6,7 @@ export async function uploadSlackFileToMovidesk(ticketId, file) {
     const slackResponse = await fetch(file.url_private, { 
         headers: 
         {
-            Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}`
+            Authorization: `Bearer ${config.slack.botToken}`
         }
     })
 
@@ -17,7 +18,7 @@ export async function uploadSlackFileToMovidesk(ticketId, file) {
     
     // Envia arquivo para Movidesk
     const movideskResponse = await fetch(
-        `${process.env.URL_CREATE_FILE}?token=${process.env.MOVIDESK_TOKEN}&id=${ticketId}&actionId=1`, 
+        `${config.movidesk.urlUploadFile}?token=${config.movidesk.token}&id=${ticketId}&actionId=1`, 
         {
             method: "POST",
             body: formData

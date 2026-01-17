@@ -1,6 +1,3 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
 export const config = {
   port: process.env.PORT,
   slack: {
@@ -16,10 +13,8 @@ export const config = {
     urlBase: process.env.URL_BASE,
     token: process.env.MOVIDESK_TOKEN,
     urlCreateTicket: process.env.URL_CREATE_TICKET,
-    urlCrudPerson: process.env.URL_CREATE_PERSON,
-    urlGetPersonByEmail: process.env.URL_GET_PERSON_BY_EMAIL,
+    urlCrudPerson: process.env.URL_PERSON,
     urlUploadFile: process.env.URL_UPLOAD_FILE,
-    urlCreateAttachment: process.env.URL_CREATE_ATTACHMENT,
     urlTicketLink: process.env.URL_TICKET_LINK
   },
   relationships: {
@@ -35,7 +30,7 @@ export const config = {
       id: process.env.GOOMER_ID,
       name: process.env.GOOMER_NAME
     },
-    anota: {
+    anotaAi: {
       id: process.env.ANOTA_ID,
       name: process.env.ANOTA_NAME,
       slaAgreement: process.env.ANOTA_SLA
@@ -60,10 +55,6 @@ export const config = {
     incomm: {
       id: process.env.INCOMMERCE_ID,
       name: process.env.INCOMMERCE_NAME
-    },
-    ifood: {
-      id: process.env.IFOOD_ID,
-      name: process.env.IFOOD_NAME
     },
     gruposc: {
       id: process.env.GRUPOSC_ID,
