@@ -1,5 +1,4 @@
-import dotenv from "dotenv"
-dotenv.config()
+import { config } from "../config/env.js"
 
 
 export async function createTicket({ clientId, assunto, descricao, threadContext }) { 
@@ -48,7 +47,7 @@ export async function createTicket({ clientId, assunto, descricao, threadContext
     }
 
     // Chama API do Movidesk
-    const response = await fetch(`${process.env.URL_CREATE_TICKET}?token=${process.env.MOVIDESK_TOKEN}`, {
+    const response = await fetch(`${config.movidesk.urlCreateTicket}?token=${config.movidesk.token}`, {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(ticketBody),
