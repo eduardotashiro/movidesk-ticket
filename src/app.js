@@ -1,12 +1,12 @@
 import figlet from "figlet"
+import {config} from "./config/env.js"
 import pkg from "@slack/bolt"
 const { App } = pkg
-import {config} from "./config/env.js"
 
 
  export const app = new App({
     token: config.slack.botToken,
-    signingSecret: config.slack.signingSecret
+    signingSecret: config.slack.signingSecret,
 })
 
 

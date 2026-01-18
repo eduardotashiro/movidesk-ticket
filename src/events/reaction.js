@@ -1,8 +1,8 @@
+import { config } from "../config/env.js"
 import { uploadSlackFileToMovidesk } from "../utils/uploadFile.js"
 import { getOrCreatePerson } from "../services/persons.js"
 import { ticketCounter } from "../db/dbQueries.js"
 import { createTicket } from "../services/movidesk.js"
-import { config } from "../config/env.js"
 
 
 export function registerTicketReaction(app) {
@@ -135,17 +135,17 @@ export function registerTicketReaction(app) {
 
             if (originalMessage.thread_ts && originalMessage.thread_ts !== originalMessage.ts) {
 
-                const messageTsFormatted = originalMessage.ts.replace('.', '').padEnd(16, '0'); //preenche o 17 com 0 pq o slack ta chato
+                const messageTsFormatted = originalMessage.ts.replace('.', '')
 
-                const threadTsFormatted = originalMessage.thread_ts.replace('.', '').padEnd(16, '0');//preenche o 17 com 0 pq o slack ta chato
+                const threadTsFormatted = originalMessage.thread_ts.replace('.', '')
 
-                let threadLink = `${config.slack.linkThread}/${event.item.channel}/p${messageTsFormatted}?thread_ts=${threadTsFormatted}&cid=${event.item.channel}`;
+                let threadLink = `${config.slack.linkThread}${event.item.channel}/p${messageTsFormatted}?thread_ts=${threadTsFormatted}&cid=${event.item.channel}`;
 
                 threadContext = `<a href="${threadLink}"target="_blank">Abrir Thread no Slack</a>`;
 
             } else {
 
-                const t = `${config.slack.linkThread}/${event.item.channel}/p${originalMessage.ts.replace('.', '').padEnd(16, '0')}`
+                const t = `${config.slack.linkThread}${event.item.channel}/p${originalMessage.ts.replace('.', '')}`
                 threadContext = `<a href="${t}"target="_blank">Abrir Thread no Slack</a>`;
             }
 
@@ -173,7 +173,7 @@ export function registerTicketReaction(app) {
             console.log("Ticket completo:", JSON.stringify(ticket, null, 2))
 
 
-            const fullTicket = await fetch(`${config.movidesk.urlBase}/public/v1/tickets?token=${config.movidesk.token}&id=${ticket.id}`)
+            const fullTicket = await fetch(`${config.movidesk.urlCreateTicket}${config.movidesk.token}&id=${ticket.id}`)
             console.log(fullTicket)
 
 
@@ -387,17 +387,17 @@ export function registerTicketReaction(app) {
 
             if (originalMessage.thread_ts && originalMessage.thread_ts !== originalMessage.ts) {
 
-                const messageTsFormatted = originalMessage.ts.replace('.', '').padEnd(16, '0'); //preenche o 17 com 0 pq o slack ta chato
+                const messageTsFormatted = originalMessage.ts.replace('.', '')
 
-                const threadTsFormatted = originalMessage.thread_ts.replace('.', '').padEnd(16, '0');//preenche o 17 com 0 pq o slack ta chato
+                const threadTsFormatted = originalMessage.thread_ts.replace('.', '')
 
-                let threadLink = `${config.slack.linkThread}/${channel}/p${messageTsFormatted}?thread_ts=${threadTsFormatted}&cid=${channel}`;;
+                let threadLink = `${config.slack.linkThread}${channel}/p${messageTsFormatted}?thread_ts=${threadTsFormatted}&cid=${channel}`;;
 
                 threadContext = `<a href="${threadLink}"target="_blank">Abrir Thread no Slack</a>`;
 
             } else {
 
-                const t = `${config.slack.linkThread}/${channel}/p${originalMessage.ts.replace('.', '').padEnd(16, '0')}`
+                const t = `${config.slack.linkThread}${channel}/p${originalMessage.ts.replace('.', '')}`
                 threadContext = `<a href="${t}"target="_blank">Abrir Thread no Slack</a>`;
             }
 
@@ -424,7 +424,7 @@ export function registerTicketReaction(app) {
             console.log("Ticket completo:", JSON.stringify(ticket, null, 2))
 
 
-            const fullTicket = await fetch(`${config.movidesk.urlBase}/public/v1/tickets?token=${config.movidesk.token}&id=${ticket.id}`)
+            const fullTicket = await fetch(`${config.movidesk.urlCreateTicket}${config.movidesk.token}&id=${ticket.id}`)
             console.log(fullTicket)
 
 

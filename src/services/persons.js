@@ -1,12 +1,12 @@
+import {config} from "../config/env.js"
 import { getRelationships } from "../organization/relationships.js"
-import config from "../config/env.js"
 
 export async function getOrCreatePerson(email, name) {
 
     console.log(` Buscando pessoa com email: ${email}`)
+    const searchEmailUrl = `${config.movidesk.urlCrudPerson}${config.movidesk.token}&$filter=emails/any(e: e/email eq '${email}')`
+    const searchUserName = `${config.movidesk.urlCrudPerson}${config.movidesk.token}&$filter=userName eq '${email}'`
 
-    const searchEmailUrl = `${config.movidesk.urlCrudPerson}?token=${config.movidesk.token}&$filter=emails/any(e: e/email eq '${email}')`
-    const searchUserName = `${config.movidesk.urlCrudPerson}?token=${config.movidesk.token}&$filter=userName eq '${email}'`
     const responseEmailUrl = await fetch(searchEmailUrl)
     const responseUserNameUrl = await fetch(searchUserName)
     console.log(`Status da busca email: ${responseEmailUrl.status}`)
@@ -34,7 +34,7 @@ export async function getOrCreatePerson(email, name) {
             ]
         }
 
-        const updateEmailResponse = await fetch(`${config.movidesk.urlBase}/public/v1/persons/?token=${config.movidesk.token}&id=${personId}`,
+        const updateEmailResponse = await fetch(`${config.movidesk.urlCrudPerson}${config.movidesk.token}&id=${personId}`,
             {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
@@ -79,7 +79,7 @@ export async function getOrCreatePerson(email, name) {
         console.log("Enviando dados para criação:", JSON.stringify(newPersonData, null, 2))
 
         try {
-            const newPersonResponse = await fetch( `${config.movidesk.urlBase}/public/v1/persons?token=${config.movidesk.token}`,
+            const newPersonResponse = await fetch( `${config.movidesk.urlCrudPerson}${config.movidesk.token}`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -120,7 +120,7 @@ export async function getOrCreatePerson(email, name) {
             relationships
         }
 
-        const updateRelationshipResponse = await fetch(`${config.movidesk.urlBase}/public/v1/persons/?token=${config.movidesk.token}&id=${person.id}`,
+        const updateRelationshipResponse = await fetch(`${config.movidesk.urlCrudPerson}${config.movidesk.token}&id=${person.id}`,
             {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
@@ -143,7 +143,7 @@ export async function getOrCreatePerson(email, name) {
     if (!person.isActive) {
         console.log(" Reativa usuário...")
 
-        const activateResponse = await fetch(`${config.movidesk.urlBase}/public/v1/persons/?token=${config.movidesk.token}&id=${person.id}`,
+        const activateResponse = await fetch(`${config.movidesk.urlCrudPerson}${config.movidesk.token}&id=${person.id}`,
             {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },

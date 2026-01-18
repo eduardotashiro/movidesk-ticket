@@ -47,7 +47,7 @@ export async function createTicket({ clientId, assunto, descricao, threadContext
     }
 
     // Chama API do Movidesk
-    const response = await fetch(`${config.movidesk.urlCreateTicket}?token=${config.movidesk.token}`, {
+    const response = await fetch(`${config.movidesk.urlCreateTicket}${config.movidesk.token}`, {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(ticketBody),
