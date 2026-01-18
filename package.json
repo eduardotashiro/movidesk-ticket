@@ -2,11 +2,11 @@
   "name": "ticket",
   "version": "1.0.0",
   "description": "Integração com Movidesk & Slack para abertura e gestão de tickets via reação de mensagens.",
-  "main": "src/index.js",
+  "main": "src/server.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
-    "testes": "ngrok http 3001"
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "testes": "ngrok http 3000"
   },
   "keywords": [
     "slack , movidesk"
@@ -21,7 +21,6 @@
     "pg": "^8.16.3"
   },
   "devDependencies": {
-    "ngrok": "^5.0.0-beta.2",
     "nodemon": "^3.1.10"
   },
   "engines": {

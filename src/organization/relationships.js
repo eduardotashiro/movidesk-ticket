@@ -1,5 +1,4 @@
-import dotenv from "dotenv"
-dotenv.config()
+import {config} from "../config/env.js"
 
 export function getRelationships(email) {
 
@@ -10,8 +9,8 @@ export function getRelationships(email) {
   switch (domain) {
     case "angeloni.com.br":
       relationship = {
-        id: process.env.ANGELONI_ID,
-        name: process.env.ANGELONI_NAME,
+        id:config.relationships.angeloni.id,
+        name: config.relationships.angeloni.name,
         slaAgreement: null,
         allowAllServices: true,
       }
@@ -19,8 +18,8 @@ export function getRelationships(email) {
 
     case "cardapioweb.com":
       relationship = {
-        id: process.env.CARDAPIOWEB_ID,
-        name: process.env.CARDAPIOWEB_NAME,
+        id: config.relationships.cardapioweb.id,
+        name: config.relationships.cardapioweb.name,
         slaAgreement: null,
         allowAllServices: true,
       }
@@ -28,8 +27,8 @@ export function getRelationships(email) {
 
     case "goomer.com.br":
       relationship = {
-        id: process.env.GOOMER_ID,
-        name: process.env.GOOMER_NAME,
+        id: config.relationships.goomer.id,
+        name: config.relationships.goomer.name,
         slaAgreement: null,
         allowAllServices: true,
       }
@@ -37,92 +36,92 @@ export function getRelationships(email) {
 
     case "anota.ai":   
       relationship = {
-        id: process.env.ANOTA_ID,
-        name: process.env.ANOTA_NAME,
-        slaAgreement: process.env.ANOTA_SLA,
+        id: config.relationships.anotaAi.id,
+        name: config.relationships.anotaAi.name,
+        slaAgreement: config.relationships.anotaAi.slaAgreement,
         allowAllServices: true,
       }
       break
 
     case "clickbus.com":
       relationship = {
-        id:process.env.CLICKBUS_ID,
-        name:process.env.CLICKBUS_NAME,
+        id: config.relationships.clickbus.id,
+        name: config.relationships.clickbus.name,
         allowAllServices: true,
       }
       break
 
     case "ab-inbev.com":
       relationship = {
-        id: process.env.ABINBEV_ID,
-        name:process.env.ABINBEV_NAME,
+        id: config.relationships.abinbev.id,
+        name: config.relationships.abinbev.name,
         allowAllServices: true,
       }
       break
 
     case "incomm.com":
       relationship = {
-        id: process.env.INCOMM_ID,
-        name: process.env.INCOMM_NAME,
+        id: config.relationships.incomm.id,
+        name: config.relationships.incomm.name,
         allowAllServices: true,
       }
       break
 
     case "grupoaste.com.br":
       relationship = {
-        id: process.env.GRUPOASTE_ID,
-        name: process.env.GRUPOASTE_NAME,
+        id: config.relationships.grupoaste.id,
+        name: config.relationships.grupoaste.name,
         allowAllServices: true,
       }
       break
 
     case "supernosso.com.br":
       relationship = {
-        id: process.env.SUPERNOSSO_ID,
-        name: process.env.SUPERNOSSO_NAME,
+        id: config.relationships.supernosso.id,
+        name: config.relationships.supernosso.name,
         allowAllServices: true,
       }
       break
 
     case "deliverymuch.com.br":
       relationship = {
-        id: process.env.DELIVERYMUCH_ID,
-        name: process.env.DELIVERYMUCH_NAME,
+        id: config.relationships.deliverymuch.id,
+        name: config.relationships.deliverymuch.name,
         allowAllServices: true,
       }
       break
 
     case "gruposc.com.br":
       relationship = {
-        id: process.env.GRUPOSC_ID,
-        name: process.env.GRUPOSC_NAME,
+        id: config.relationships.gruposc.id,
+        name: config.relationships.gruposc.name,
         allowAllServices: true,
       }
       break
 
     case "fastshop.com.br":
       relationship = {
-        id: process.env.FASTSHOP_ID,
-        name: process.env.FASTSHOP_NAME,
-        slaAgreement: process.env.FASTSHOP_SLA,
+        id: config.relationships.fastshop.id,
+        name: config.relationships.fastshop.name,
+        slaAgreement: config.relationships.fastshop.slaAgreement,
         allowAllServices: true,
       }
       break
 
       case "tuna.uy":
       relationship = {
-        id: process.env.TUNA_ID,
-        name: process.env.TUNA_NAME,
-        slaAgreement: process.env.TUNA_SLA,
+        id: config.relationships.tuna.id,
+        name: config.relationships.tuna.name,
+        slaAgreement: config.relationships.tuna.slaAgreement,
         allowAllServices: true,
       }
       break
 
     default:
       relationship = {
-        id: process.env.DEFAULT_ID,
-        name: process.env.DEFAULT_NAME,
-        slaAgreement: process.env.DEFAULT_SLA,
+        id: config.relationships.default.id,
+        name: config.relationships.default.name,
+        slaAgreement: config.relationships.default.slaAgreement,
         forceChildrenToHaveSomeAgreement: false,
         allowAllServices: true
 

@@ -1,7 +1,5 @@
 import { showMetrics } from "../db/dbQueries.js"
-import dotenv from "dotenv"
-dotenv.config()
-
+import {config} from "../config/env.js"
 
 export function homeTab(app) {
   app.event("app_home_opened", async ({ event, client }) => {
@@ -17,7 +15,7 @@ export function homeTab(app) {
           blocks: [
             {
               type: "image",
-              image_url: process.env.HOME_BANNER_URL,
+              image_url: config.slack.bannerHome,
               alt_text: "Banner principal",
             },
             {

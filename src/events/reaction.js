@@ -1,10 +1,8 @@
-import { createTicket } from "../services/movidesk.js"
+import { config } from "../config/env.js"
 import { uploadSlackFileToMovidesk } from "../utils/uploadFile.js"
 import { getOrCreatePerson } from "../services/persons.js"
 import { ticketCounter } from "../db/dbQueries.js"
-import dotenv from "dotenv"
-
-dotenv.config()
+import { createTicket } from "../services/movidesk.js"
 
 
 export function registerTicketReaction(app) {
@@ -137,20 +135,21 @@ export function registerTicketReaction(app) {
 
             if (originalMessage.thread_ts && originalMessage.thread_ts !== originalMessage.ts) {
 
-                const messageTsFormatted = originalMessage.ts.replace('.', '').padEnd(16, '0'); //preenche o 17 com 0 pq o slack ta chato
+                const messageTsFormatted = originalMessage.ts.replace('.', '')
 
-                const threadTsFormatted = originalMessage.thread_ts.replace('.', '').padEnd(16, '0');//preenche o 17 com 0 pq o slack ta chato
+                const threadTsFormatted = originalMessage.thread_ts.replace('.', '')
 
-                let threadLink = `${process.env.URL_THREAD_LINK}/${event.item.channel}/p${messageTsFormatted}?thread_ts=${threadTsFormatted}&cid=${event.item.channel}`;
+                let threadLink = `${config.slack.linkThread}${event.item.channel}/p${messageTsFormatted}?thread_ts=${threadTsFormatted}&cid=${event.item.channel}`;
 
                 threadContext = `<a href="${threadLink}"target="_blank">Abrir Thread no Slack</a>`;
 
             } else {
 
-                const t = `${process.env.URL_THREAD_LINK}/${event.item.channel}/p${originalMessage.ts.replace('.', '').padEnd(16, '0')}`
+                const t = `${config.slack.linkThread}${event.item.channel}/p${originalMessage.ts.replace('.', '')}`
                 threadContext = `<a href="${t}"target="_blank">Abrir Thread no Slack</a>`;
             }
 
+// parei aqui
 
             /*************/
 
@@ -164,7 +163,7 @@ export function registerTicketReaction(app) {
             })
 
             // Atualiza placeholder com link do ticket
-            const linkMovidesk = `${process.env.URL_TICKET_LINK}${ticket.protocol}`
+            const linkMovidesk = `${config.movidesk.urlTicketLink}${ticket.protocol}`
             await client.chat.update({
                 channel: event.item.channel,
                 ts: placeholderTs,
@@ -174,7 +173,7 @@ export function registerTicketReaction(app) {
             console.log("Ticket completo:", JSON.stringify(ticket, null, 2))
 
 
-            const fullTicket = await fetch(`${process.env.MOVIDESK_API}/public/v1/tickets?token=${process.env.MOVIDESK_TOKEN}&id=${ticket.id}`)
+            const fullTicket = await fetch(`${config.movidesk.urlCreateTicket}${config.movidesk.token}&id=${ticket.id}`)
             console.log(fullTicket)
 
 
@@ -388,17 +387,17 @@ export function registerTicketReaction(app) {
 
             if (originalMessage.thread_ts && originalMessage.thread_ts !== originalMessage.ts) {
 
-                const messageTsFormatted = originalMessage.ts.replace('.', '').padEnd(16, '0'); //preenche o 17 com 0 pq o slack ta chato
+                const messageTsFormatted = originalMessage.ts.replace('.', '')
 
-                const threadTsFormatted = originalMessage.thread_ts.replace('.', '').padEnd(16, '0');//preenche o 17 com 0 pq o slack ta chato
+                const threadTsFormatted = originalMessage.thread_ts.replace('.', '')
 
-                let threadLink = `${process.env.URL_THREAD_LINK}/${channel}/p${messageTsFormatted}?thread_ts=${threadTsFormatted}&cid=${channel}`;;
+                let threadLink = `${config.slack.linkThread}${channel}/p${messageTsFormatted}?thread_ts=${threadTsFormatted}&cid=${channel}`;;
 
                 threadContext = `<a href="${threadLink}"target="_blank">Abrir Thread no Slack</a>`;
 
             } else {
 
-                const t = `${process.env.URL_THREAD_LINK}/${channel}/p${originalMessage.ts.replace('.', '').padEnd(16, '0')}`
+                const t = `${config.slack.linkThread}${channel}/p${originalMessage.ts.replace('.', '')}`
                 threadContext = `<a href="${t}"target="_blank">Abrir Thread no Slack</a>`;
             }
 
@@ -415,7 +414,7 @@ export function registerTicketReaction(app) {
             })
 
             // Atualiza placeholder com link do ticket
-            const linkMovidesk = `${process.env.URL_TICKET_LINK}${ticket.protocol}`
+            const linkMovidesk = `${config.movidesk.urlTicketLink}${ticket.protocol}`
             await client.chat.update({
                 channel: channel,
                 ts: metadata.button_ts,
@@ -425,7 +424,7 @@ export function registerTicketReaction(app) {
             console.log("Ticket completo:", JSON.stringify(ticket, null, 2))
 
 
-            const fullTicket = await fetch(`${process.env.MOVIDESK_API}/public/v1/tickets?token=${process.env.MOVIDESK_TOKEN}&id=${ticket.id}`)
+            const fullTicket = await fetch(`${config.movidesk.urlCreateTicket}${config.movidesk.token}&id=${ticket.id}`)
             console.log(fullTicket)
 
 
