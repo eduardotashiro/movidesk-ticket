@@ -72,7 +72,7 @@ export function registerTicketReaction(app) {
 
             // Pega info do autor 
             const messageAuthorInfo = await client.users.info({ user: messageAuthorId })
-            const email = undefined //`${Date.now()}@teste.com`  | undefined undefined// m
+            const email = messageAuthorInfo.user.profile.email //`${Date.now()}@teste.com`  | undefined undefined// m
             const name = messageAuthorInfo.user.profile.real_name //
 
 
@@ -86,6 +86,13 @@ export function registerTicketReaction(app) {
                     channel: event.item.channel,
                     thread_ts: event.item.ts,
                     text: `É necessario um email valido para a criação de um ticket`,
+                     metadata:{
+                        event_type:"solicitar_email",
+                        event_payload:{
+                            original_message_ts:event.item.ts,       //add metadados  arq
+                            channel:event.item.channel
+                        }
+                     },
                     blocks: [
                         {
                             type: "section",
@@ -252,11 +259,12 @@ export function registerTicketReaction(app) {
 
     app.action("pega_email_btn", async ({ ack, body, client }) => {
         await ack()
+          const originalTs = body.message.metadata.event_payload.original_message_ts
 
         const metadata = {
             channel: body.channel.id,
             button_ts: body.message.ts, //dddddddddddddddddddddddddddddddddddd
-            ts: body.message.thread_ts || body.message.ts,
+            ts: originalTs,
             messageAuthorId: body.user.id
         }
 
@@ -341,7 +349,11 @@ export function registerTicketReaction(app) {
             let text = originalMessage.text
             const files = originalMessage.files || []
 
-
+console.log(`----------------------`)
+console.log(`Quantidade de arquivos, ${files.length}`)
+console.log(`arquivos completos, ${JSON.stringify(files,null,2)}`)
+console.log(`mensagem original completa ${JSON.stringify(originalMessage,null,2)}`)
+console.log(`----------------------`)
 
 
             // substitui menções <@ID> pelo nome real quando for para o movidesk
@@ -446,7 +458,11 @@ export function registerTicketReaction(app) {
 
             // Upload de arquivos, se tiver
             if (files.length > 0) {
+                console.log(`tentando fazer upload de ${files.length}, arquivos`)
                 await Promise.all(files.map((f) => uploadSlackFileToMovidesk(ticket.id, f)))
+                console.log(`upload finalizado!`)
+            }else{
+                console.log(`nenhum arquivo para upload`)
             }
 
         } catch (error) {
