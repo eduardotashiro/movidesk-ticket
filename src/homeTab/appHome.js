@@ -22,7 +22,7 @@ export function homeTab(app) {
               type: "header",
               text: {
                 type: "plain_text",
-                text: `:tuna-bot: Total de Tickets criados: ${ticketCount} `, //${ticketCount} <- sabia que um dia iria te usar 
+                text: `:tuna-bot: Total de Tickets: ${ticketCount} `, 
                 emoji: true,
               },
             },
