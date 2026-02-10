@@ -20,7 +20,13 @@ export const receiver = new ExpressReceiver({
 
 receiver.app.use(express.json());
 
-receiver.app.post("/webhook/ticket", async (req, res) => {
+receiver.app.post("/webhook/ticket-aguardando-cliente-24h", async (req, res) => {
+  const payload = req.body;
+  console.log("webhook de 24h recebido:", payload);
+  res.status(200).send("Webhook de 24h recebido com sucesso!");
+});
+
+receiver.app.post("/webhook/ticket-resolvido", async (req, res) => {
   const payload = req.body;
   const subject = payload.Subject
   const status = payload.Status;
