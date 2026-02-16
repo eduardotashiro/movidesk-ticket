@@ -1,9 +1,9 @@
 import figlet from "figlet"
-import {config} from "./config/env.js"
-import { ticketResolve} from "./events/reaction.js"
-// import { App , ExpressReceiver, LogLevel } from "@slack/bolt";
+import { config } from "./config/env.js"
+import { ticketResolve } from "./events/reaction.js"
+import { ticket24hForClose } from "./events/reaction.js";
 import pkg from '@slack/bolt';
-const { App , ExpressReceiver, LogLevel } = pkg;
+const { App, ExpressReceiver, LogLevel } = pkg;
 import express from "express"
 
 export const receiver = new ExpressReceiver({
@@ -12,9 +12,9 @@ export const receiver = new ExpressReceiver({
   clientSecret: config.slack.clientSecret,
 });
 
- export const app = new App({
-  receiver,  
-  logLevel:LogLevel.INFO,
+export const app = new App({
+  receiver,
+  logLevel: LogLevel.INFO,
   token: config.slack.botToken
 })
 
@@ -23,27 +23,16 @@ receiver.app.use(express.json());
 receiver.app.post("/webhook/ticket-aguardando-cliente-24h", async (req, res) => {
   const payload = req.body;
   console.log("webhook de 24h recebido:", payload);
-  res.status(200).send("Webhook de 24h recebido com sucesso!");
+  await ticket24hForClose(app, payload.Id)
+  return res.status(200).send("Webhook de 24h recebido com sucesso!");
 });
 
 receiver.app.post("/webhook/ticket-resolvido", async (req, res) => {
   const payload = req.body;
-  const subject = payload.Subject
-  const status = payload.Status;
-
-
-  if (subject.startsWith("Ticket via Slack")) {
-    console.log("Processando ticket do Slack...");
-    console.log(`Título: ${subject}`);
-    console.log(`Status: ${status}`);
-    console.log(payload)
-
-ticketResolve(app,payload.Id)
-    //... logica para enviar no slack
-    return res.status(200).send("OK");
-  } 
-  console.log(`Ticket ignorado: ${subject}`);
-  res.status(200).send("ignorado, não é tkt do slack...");
+  console.log(payload)
+    console.log("webhook de resolvido recebido ido:", payload);
+  await ticketResolve(app, payload.Id)
+  return res.status(200).send("Webhook de resolvido recebido com sucesso po");
 });
 
 

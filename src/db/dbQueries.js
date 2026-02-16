@@ -43,7 +43,7 @@ export async function catchMetadata(ticket_id, slack_thread_ts, slack_channel_id
     }
 }
 
-
+//link movidesk é threadcontext... meu deus
 
 
 //manda msg de resolvido no slack
@@ -60,6 +60,45 @@ export async function catchInfo(webhook_ticket_id) {
         return []
     }
 }
+
+//webhook At Least Once Delivery
+
+export async function checagemDeEnvio24h(webhook_ticket_id) {
+    try {
+        const result = await pool.query(
+            `select webhook_24h_sent
+            from ticket_slack_metadata
+            where ticket_id = $1`, [webhook_ticket_id]
+        );
+        return result.rows[0];
+    } catch (error) {
+        console.log(`erro pegar o webhook_24h_sent do db :`, error.message);
+        return []
+    }
+} //{ webhook_24h_sent: false }
+
+
+export async function atualizaChecadorDeEnvioDe24h(webhook_ticket_id) {
+    try {
+        const result = await pool.query(
+            `update ticket_slack_metadata
+            set webhook_24h_sent = true
+            where ticket_id = $1`, [webhook_ticket_id]
+        );
+        return result.rows[0];
+    } catch (error) {
+        console.log(`atualizando para evitar duplicadas`, error.message);
+        return []
+    }
+}
+
+// UPDATE Customers
+// SET email = 'newemail@example.com'
+// WHERE CustomerID = 1;
+
+// curl -X POST http://...../webhook/ticket-aguardando-cliente-24h \
+// -H "Content-Type: application/json" \
+// -d '{"Id": 58896}'
 
 // Algo conceitual tipo:
 // ticket_id (chave)

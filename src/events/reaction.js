@@ -1,8 +1,9 @@
 import { config } from "../config/env.js"
 import { uploadSlackFileToMovidesk } from "../utils/uploadFile.js"
 import { getOrCreatePerson } from "../services/persons.js"
-import { ticketCounter , catchMetadata, catchInfo } from "../db/dbQueries.js"
+import { ticketCounter, catchMetadata, catchInfo, checagemDeEnvio24h, atualizaChecadorDeEnvioDe24h } from "../db/dbQueries.js"
 import { createTicket } from "../services/movidesk.js"
+
 
 
 export function registerTicketReaction(app) {
@@ -82,17 +83,17 @@ export function registerTicketReaction(app) {
             //COMEÇO NOVA FEAT
             // se email é undefined, pede via modal
             if (!email || email === undefined) {
-                 await client.chat.postMessage({
+                await client.chat.postMessage({
                     channel: event.item.channel,
                     thread_ts: event.item.ts,
                     text: `É necessario um email valido para a criação de um ticket`,
-                     metadata:{
-                        event_type:"solicitar_email",
-                        event_payload:{
-                            original_message_ts:event.item.ts,       //add metadados  arq
-                            channel:event.item.channel
+                    metadata: {
+                        event_type: "solicitar_email",
+                        event_payload: {
+                            original_message_ts: event.item.ts,       //add metadados  arq
+                            channel: event.item.channel
                         }
-                     },
+                    },
                     blocks: [
                         {
                             type: "section",
@@ -152,7 +153,7 @@ export function registerTicketReaction(app) {
                 threadContext = `<a href="${t}"target="_blank">Abrir Thread no Slack</a>`;
             }
 
-// parei aqui
+            // parei aqui
 
             /*************/
 
@@ -165,9 +166,9 @@ export function registerTicketReaction(app) {
                 threadContext,
             })
 
-            
-            
-            
+
+
+
             // Atualiza placeholder com link do ticket
             const linkMovidesk = `${config.movidesk.urlTicketLink}${ticket.protocol}`
             await client.chat.update({
@@ -175,20 +176,20 @@ export function registerTicketReaction(app) {
                 ts: placeholderTs,
                 text: `Olá <@${messageAuthorId}> :wave::skin-tone-4:\n\nSeu ticket foi criado na *Central de Ajuda Tuna*.  Acompanhe sua solicitação em: <${linkMovidesk}|${ticket.protocol}>.\n\n\`\`\`Se for seu primeiro acesso, acesse "Obter uma senha" na página de login.\`\`\`\nAgradecemos sua atenção.`,
             })
-            
+
             //chama func para insert
-            
+
             console.log("Ticket completo:", JSON.stringify(ticket, null, 2))
-           
-            
-            catchMetadata(ticket.id,placeholderTs,event.item.channel,messageAuthorId,ticket.protocol,linkMovidesk);
-       
 
 
-// Ticket completo: {
-//   "id": 58896,
-//   "protocol": "202601280001308"
-// }
+            catchMetadata(ticket.id, placeholderTs, event.item.channel, messageAuthorId, ticket.protocol, linkMovidesk);
+
+
+
+            // Ticket completo: {
+            //   "id": 58896,
+            //   "protocol": "202601280001308"
+            // }
 
 
             const fullTicket = await fetch(`${config.movidesk.urlCreateTicket}${config.movidesk.token}&id=${ticket.id}`)
@@ -259,7 +260,7 @@ export function registerTicketReaction(app) {
 
     app.action("pega_email_btn", async ({ ack, body, client }) => {
         await ack()
-          const originalTs = body.message.metadata.event_payload.original_message_ts
+        const originalTs = body.message.metadata.event_payload.original_message_ts
 
         const metadata = {
             channel: body.channel.id,
@@ -324,11 +325,11 @@ export function registerTicketReaction(app) {
 
 
 
-//DUPLICATED
+    //DUPLICATED
 
 
 
-  
+
     app.view("email_modal", async ({ ack, view, client }) => {
         await ack()
 
@@ -349,11 +350,11 @@ export function registerTicketReaction(app) {
             let text = originalMessage.text
             const files = originalMessage.files || []
 
-console.log(`----------------------`)
-console.log(`Quantidade de arquivos, ${files.length}`)
-console.log(`arquivos completos, ${JSON.stringify(files,null,2)}`)
-console.log(`mensagem original completa ${JSON.stringify(originalMessage,null,2)}`)
-console.log(`----------------------`)
+            console.log(`----------------------`)
+            console.log(`Quantidade de arquivos, ${files.length}`)
+            console.log(`arquivos completos, ${JSON.stringify(files, null, 2)}`)
+            console.log(`mensagem original completa ${JSON.stringify(originalMessage, null, 2)}`)
+            console.log(`----------------------`)
 
 
             // substitui menções <@ID> pelo nome real quando for para o movidesk
@@ -395,7 +396,7 @@ console.log(`----------------------`)
                 text: `Olá <@${messageAuthorId}> :wave::skin-tone-4: \n\nSeu ticket esta sendo criado ... `
             })
 
-          
+
 
             const userInfo = await client.users.info({ user: messageAuthorId })
             const name = userInfo.user.profile.real_name
@@ -437,7 +438,7 @@ console.log(`----------------------`)
                 threadContext,
             })
 
-            
+
             // Atualiza placeholder com link do ticket
             const linkMovidesk = `${config.movidesk.urlTicketLink}${ticket.protocol}`
             await client.chat.update({
@@ -445,13 +446,13 @@ console.log(`----------------------`)
                 ts: metadata.button_ts,
                 text: `Olá <@${messageAuthorId}> :wave::skin-tone-4:\n\nSeu ticket foi criado na *Central de Ajuda Tuna*.  Acompanhe sua solicitação em: <${linkMovidesk}|${ticket.protocol}>.\n\n\`\`\`Se for seu primeiro acesso, acesse "Obter uma senha" na página de login.\`\`\`\nAgradecemos sua atenção.`,
             })
-            
+
             console.log("Ticket completo:", JSON.stringify(ticket, null, 2))
-            
+
             //chama func para insert
-//chama func para insert
-            catchMetadata(ticket.id,metadata.button_ts,channel,messageAuthorId,ticket.protocol,linkMovidesk);
-            
+            //chama func para insert
+            catchMetadata(ticket.id, metadata.button_ts, channel, messageAuthorId, ticket.protocol, linkMovidesk);
+
             const fullTicket = await fetch(`${config.movidesk.urlCreateTicket}${config.movidesk.token}&id=${ticket.id}`)
             console.log(fullTicket)
 
@@ -461,7 +462,7 @@ console.log(`----------------------`)
                 console.log(`tentando fazer upload de ${files.length}, arquivos`)
                 await Promise.all(files.map((f) => uploadSlackFileToMovidesk(ticket.id, f)))
                 console.log(`upload finalizado!`)
-            }else{
+            } else {
                 console.log(`nenhum arquivo para upload`)
             }
 
@@ -489,18 +490,49 @@ console.log(`----------------------`)
 export async function ticketResolve(app, webhook_ticket_id) {
     const resultDB = await catchInfo(webhook_ticket_id)
     try {
-      if (!resultDB) {
-        console.log(`tkt não encontrado no db`)
-        return
-      }
+        if (!resultDB) {
+            console.log(`tkt não encontrado no db`)
+            return
+        }
 
-      await app.client.chat.postMessage({
-          channel: resultDB.slack_channel_id,
-          thread_ts: resultDB.slack_thread_ts,                           
-          text:`Olá <@${resultDB.user_id}>,\n\nSeu atendimento <${resultDB.threadcontext}|${resultDB.protocol}> foi concluído :check:\n\nPermanecemos à disposição.`
+        await app.client.chat.postMessage({
+            channel: resultDB.slack_channel_id,
+            thread_ts: resultDB.slack_thread_ts,
+            text: `Olá <@${resultDB.user_id}>,\n\nSeu atendimento <${resultDB.threadcontext}|${resultDB.protocol}> foi concluído :check:\n\nPermanecemos à disposição.`
         })
-// <${linkMovidesk}|${ticket.protocol}> threadContext
+        // <${linkMovidesk}|${ticket.protocol}> threadContext
     } catch (error) {
-      console.log(`erro ao enviar resolvido no slack:`, error.message)
+        console.log(`erro ao enviar resolvido no slack:`, error.message)
+    }
+}
+
+
+//mesma lógica, posso reaproveitar quando for refatorar
+
+
+//24H FOR FCLOSE DE TKT
+
+export async function ticket24hForClose(app, webhook_ticket_id) {
+    const resultDB = await catchInfo(webhook_ticket_id)
+    const check = await checagemDeEnvio24h(webhook_ticket_id)
+    try {
+        if (!resultDB) {
+            console.log(`tkt não encontrado no db`)
+            return
+        }
+
+        if (!check.webhook_24h_sent) {
+            await app.client.chat.postMessage({
+                channel: resultDB.slack_channel_id,
+                thread_ts: resultDB.slack_thread_ts,
+                text: `Olá, <@${resultDB.user_id}>.\n\nIdentificamos que ainda não houve retorno no atendimento <${resultDB.threadcontext} | ${resultDB.protocol}>.\n\nCaso não haja uma resposta nas próximas 24 horas, o atendimento será finalizado automáticamente\n\nAgradecemos a compreensão.`
+            })
+
+            await atualizaChecadorDeEnvioDe24h(webhook_ticket_id)
+        }
+        
+        // <${linkMovidesk}|${ticket.protocol}> threadContext
+    } catch (error) {
+        console.log(`erro ao enviar resolvido no slack:`, error.message)
     }
 }
