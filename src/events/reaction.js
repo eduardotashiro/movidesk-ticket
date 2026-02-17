@@ -525,7 +525,7 @@ export async function ticket24hForClose(app, webhook_ticket_id) {
             await app.client.chat.postMessage({
                 channel: resultDB.slack_channel_id,
                 thread_ts: resultDB.slack_thread_ts,
-                text: `Olá, <@${resultDB.user_id}>.\n\nIdentificamos que ainda não houve retorno no atendimento <${resultDB.threadcontext} | ${resultDB.protocol}>.\n\nCaso não haja uma resposta nas próximas 24 horas, o atendimento será finalizado automáticamente\n\nAgradecemos a compreensão.`
+                text: `Olá, <@${resultDB.user_id}>.\n\nIdentificamos que ainda não houve retorno no atendimento <${resultDB.threadcontext} | ${resultDB.protocol}>.\n\nCaso não haja uma resposta nas próximas 24 horas, o atendimento será finalizado automaticamente\n\nAgradecemos a compreensão.`
             })
 
             await atualizaChecadorDeEnvioDe24h(webhook_ticket_id)
