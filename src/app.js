@@ -1,6 +1,7 @@
 import figlet from "figlet"
 import { config } from "./config/env.js"
 import { ticketResolve } from "./events/reaction.js"
+import { ticketDedicated } from "./events/reaction.js"
 import { ticket24hForClose } from "./events/reaction.js";
 import pkg from '@slack/bolt';
 const { App, ExpressReceiver, LogLevel } = pkg;
@@ -30,9 +31,18 @@ receiver.app.post("/webhook/ticket-aguardando-cliente-24h", async (req, res) => 
 receiver.app.post("/webhook/ticket-resolvido", async (req, res) => {
   const payload = req.body;
   console.log(payload)
-    console.log("webhook de resolvido recebido ido:", payload);
+  console.log("webhook de resolvido recebido ido:", payload);
   await ticketResolve(app, payload.Id)
   return res.status(200).send("Webhook de resolvido recebido com sucesso po");
+});
+
+receiver.app.post("/webhook/dedicado-notificado", async (req, res) => {
+  const payload = req.body;
+  console.log("Webhook recibido:", payload.Id);
+  if (payload.Status === 'Novo') {
+    await ticketDedicated(app, payload);
+  }
+  return res.status(200).send("OK");
 });
 
 

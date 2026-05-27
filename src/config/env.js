@@ -7,7 +7,8 @@ export const config = {
     signingSecret: process.env.SLACK_SIGNING_SECRET,
     botToken: process.env.SLACK_BOT_TOKEN,
     linkThread: process.env.URL_THREAD_LINK,
-    bannerHome: process.env.HOME_BANNER_URL
+    bannerHome: process.env.HOME_BANNER_URL,
+    channel: process.env.ONLY
   },
   dataBase: {
     url: process.env.DATABASE_URL

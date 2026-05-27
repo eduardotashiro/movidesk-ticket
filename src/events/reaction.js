@@ -530,9 +530,32 @@ export async function ticket24hForClose(app, webhook_ticket_id) {
 
             await atualizaChecadorDeEnvioDe24h(webhook_ticket_id)
         }
-        
+
         // <${linkMovidesk}|${ticket.protocol}> threadContext
     } catch (error) {
         console.log(`erro ao enviar resolvido no slack:`, error.message)
+    }
+}
+
+
+
+
+//Notificación de llamada dedicada
+
+export async function ticketDedicated(app, payload) {
+    try {
+        const ticket_id = payload.Id;
+        const subject = payload.Subject;
+
+        const movidesk_url = `https://tuna.movidesk.com/Ticket/EditByProtocol/${ticket_id}`;
+
+        await app.client.chat.postMessage({
+            channel: config.slack.channel,
+            text: `Ticket Click Bus <${movidesk_url}|${ticket_id}>`
+        });
+
+        console.log(`Notificación enviada al ticket. ${ticket_id}`);
+    } catch (error) {
+        console.error("Error al enviar la notificación:", error.message);
     }
 }
