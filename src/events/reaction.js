@@ -545,16 +545,26 @@ export async function ticket24hForClose(app, webhook_ticket_id) {
 export async function ticketDedicated(app, payload) {
     try {
         const ticket_id = payload.Id;
-        // const subject = payload.Subject;
+        const urgency = payload.Urgency;
+        // console.log(`ur:${urgency}`)
+        const movidesk_url = `${config.movidesk.urlTicketLink}${ticket_id}`;
 
-        const movidesk_url = `https://tuna.movidesk.com/Ticket/EditByProtocol/${ticket_id}`;
+        if (urgency == 'Urgente') {
+            await app.client.chat.postMessage({
+                channel: config.slack.channel,
+                text: `:alert: *[URGENTE] Novo Chamado Click Bus <${movidesk_url}|#${ticket_id}>*`
+            });
+            console.log(`Notificación enviada al ticket. ${ticket_id}`);
 
-        await app.client.chat.postMessage({
-            channel: config.slack.channel,
-            text: `:alert: *Novo Chamado Click Bus <${movidesk_url}|#${ticket_id}>*` 
-        });
+        } else {
+            await app.client.chat.postMessage({
+                channel: config.slack.channel,
+                text: `:alert: *Novo Chamado Click Bus <${movidesk_url}|#${ticket_id}>*`
+            });
 
-        console.log(`Notificación enviada al ticket. ${ticket_id}`); 
+            console.log(`Notificación enviada al ticket. ${ticket_id}`);
+        }
+
     } catch (error) {
         console.error("Error al enviar la notificación:", error.message);
     }
@@ -566,7 +576,9 @@ export async function ticketUrgentePo(app, payload) {
     try {
         const ticket_id = payload.Id;
 
-        const movidesk_url = `https://tuna.movidesk.com/Ticket/EditByProtocol/${ticket_id}`; 
+        const movidesk_url = `${config.movidesk.urlTicketLink}${ticket_id}`;
+
+
 
         await app.client.chat.postMessage({
             channel: config.slack.channel,

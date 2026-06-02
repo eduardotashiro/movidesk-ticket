@@ -39,7 +39,7 @@ receiver.app.post("/webhook/ticket-resolvido", async (req, res) => {
 receiver.app.post("/webhook/dedicado-notificado", async (req, res) => {
   const payload = req.body;
   console.log("Webhook recibido:", payload.Id);
-  // console.log("datos :", payload);
+  console.log("datos :", payload);
   await ticketDedicated(app, payload);
   return res.status(200).send("OK");
 });
@@ -47,7 +47,7 @@ receiver.app.post("/webhook/dedicado-notificado", async (req, res) => {
 receiver.app.post("/webhook/urgente-notificado", async (req, res) => {
   const payload = req.body;
   console.log("Webhook recibido:", payload.Id);
-  // console.log("datos :", payload);
+  console.log("datos :", payload);
   await ticketUrgentePo(app, payload);
   return res.status(200).send("OK");
 });
