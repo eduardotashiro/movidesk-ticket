@@ -3,6 +3,7 @@ import { uploadSlackFileToMovidesk } from "../utils/uploadFile.js"
 import { getOrCreatePerson } from "../services/persons.js"
 import { ticketCounter, catchMetadata, catchInfo, checagemDeEnvio24h, atualizaChecadorDeEnvioDe24h } from "../db/dbQueries.js"
 import { createTicket } from "../services/movidesk.js"
+import { parseMentions } from "../services/ticketProcessor.js"
 
 
 
@@ -36,15 +37,10 @@ export function registerTicketReaction(app) {
             const messageAuthorId = originalMessage.user
 
             // substitui menções <@ID> pelo nome real quando for para o movidesk
-            const mention = /<@([A-Z0-9]+)>/g
-            const matches = [...text.matchAll(mention)]
 
-            for (const match of matches) {
-                const userId = match[1]
-                const userInfo = await client.users.info({ user: userId })
-                const realName = userInfo.user.profile.real_name
-                text = text.replace(match[0], realName)
-            }
+
+            text = await parseMentions(text, client)
+
 
             // apenas arquivo n cria ticket
             if ((!text || !text.trim()) && files.length > 0) {
@@ -358,15 +354,10 @@ export function registerTicketReaction(app) {
 
 
             // substitui menções <@ID> pelo nome real quando for para o movidesk
-            const mention = /<@([A-Z0-9]+)>/g
-            const matches = [...text.matchAll(mention)]
 
-            for (const match of matches) {
-                const userId = match[1]
-                const userInfo = await client.users.info({ user: userId })
-                const realName = userInfo.user.profile.real_name
-                text = text.replace(match[0], realName)
-            }
+
+            text = await parseMentions(text, client)
+
 
             // apenas arquivo n cria ticket
             if ((!text || !text.trim()) && files.length > 0) {
