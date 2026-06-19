@@ -1,10 +1,9 @@
 import { config } from "../config/env.js"
 import { uploadSlackFileToMovidesk } from "../utils/uploadFile.js"
 import { getOrCreatePerson } from "../services/persons.js"
-import { ticketCounter, catchMetadata, catchInfo, checagemDeEnvio24h, atualizaChecadorDeEnvioDe24h } from "../db/dbQueries.js"
+import { ticketCounter, catchMetadata, catchInfo, checkWebhookSent, markWebhookSent } from "../db/dbQueries.js"
 import { createTicket } from "../services/movidesk.js"
 import { parseMentions } from "../services/ticketProcessor.js"
-
 
 
 export function registerTicketReaction(app) {
@@ -476,13 +475,18 @@ export function registerTicketReaction(app) {
 
 
 
-//RESOLVID
-
+// verifica si el webhook de resolución ya fue enviado
 export async function ticketResolve(app, webhook_ticket_id) {
     const resultDB = await catchInfo(webhook_ticket_id)
+    const check = await checkWebhookSent(webhook_ticket_id, 'webhook_resolve_sent')
     try {
         if (!resultDB) {
             console.log(`tkt não encontrado no db`)
+            return
+        }
+
+        if (!check || check.sent) {
+            console.log(`webhook de resolvido já foi enviado ou erro ao checar para esse tkt`)
             return
         }
 
@@ -491,38 +495,39 @@ export async function ticketResolve(app, webhook_ticket_id) {
             thread_ts: resultDB.slack_thread_ts,
             text: `Olá <@${resultDB.user_id}>,\n\nSeu atendimento <${resultDB.threadcontext}|${resultDB.protocol}> foi concluído :check:\n\nPermanecemos à disposição.`
         })
-        // <${linkMovidesk}|${ticket.protocol}> threadContext
+        await markWebhookSent(webhook_ticket_id, 'webhook_resolve_sent')
+
     } catch (error) {
         console.log(`erro ao enviar resolvido no slack:`, error.message)
     }
 }
 
 
-//mesma lógica, posso reaproveitar quando for refatorar
 
 
-//24H FOR FCLOSE DE TKT
-
+// marca la notificación de 24 horas como enviada
 export async function ticket24hForClose(app, webhook_ticket_id) {
     const resultDB = await catchInfo(webhook_ticket_id)
-    const check = await checagemDeEnvio24h(webhook_ticket_id)
+    const check = await checkWebhookSent(webhook_ticket_id, 'webhook_24h_sent')
     try {
         if (!resultDB) {
             console.log(`tkt não encontrado no db`)
             return
         }
 
-        if (!check.webhook_24h_sent) {
-            await app.client.chat.postMessage({
-                channel: resultDB.slack_channel_id,
-                thread_ts: resultDB.slack_thread_ts,
-                text: `Olá, <@${resultDB.user_id}>.\n\nIdentificamos que ainda não houve retorno no atendimento <${resultDB.threadcontext} | ${resultDB.protocol}>.\n\nCaso não haja uma resposta nas próximas 24 horas, o atendimento será finalizado automaticamente\n\nAgradecemos a compreensão.`
-            })
-
-            await atualizaChecadorDeEnvioDe24h(webhook_ticket_id)
+        if (!check || check.sent) {
+            console.log(`webhook de 24h já foi enviado ou erro ao checar para esse tkt`)
+            return
         }
 
-        // <${linkMovidesk}|${ticket.protocol}> threadContext
+        await app.client.chat.postMessage({
+            channel: resultDB.slack_channel_id,
+            thread_ts: resultDB.slack_thread_ts,
+            text: `Olá, <@${resultDB.user_id}>.\n\nIdentificamos que ainda não houve retorno no atendimento <${resultDB.threadcontext} | ${resultDB.protocol}>.\n\nCaso não haja uma resposta nas próximas 24 horas, o atendimento será finalizado automaticamente\n\nAgradecemos a compreensão.`
+        })
+
+        await markWebhookSent(webhook_ticket_id, 'webhook_24h_sent')
+
     } catch (error) {
         console.log(`erro ao enviar resolvido no slack:`, error.message)
     }
