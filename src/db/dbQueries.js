@@ -69,7 +69,7 @@ export async function checkWebhookSent(ticket_id, column) {
             where ticket_id = $1`, [ticket_id]
         );
         return result.rows[0];
-    }  catch (error) {
+    } catch (error) {
         console.log(`erro ao checar ${column}: `, error.message);
         return null
     }
@@ -87,5 +87,35 @@ export async function markWebhookSent(ticket_id, column) {
     } catch (error) {
         console.log(`erro ao marcar ${column} como enviado: `, error.message);
         return null
+    }
+}
+
+// verifica si el webhook ya fue procesado antes (dedicado/urgente)
+export async function checkDuplication(webhook_key) {
+    try {
+        const result = await pool.query(
+            `select 1
+            from webhook_duplication_check_only_support
+            where webhook_key = $1`, [webhook_key]
+        );
+        return result.rowCount > 0;
+    } catch (error) {
+        console.log(`erro ao checar duplicação de ${webhook_key}: `, error.message);
+        return false
+    }
+}
+
+// registra que el webhook ya fue procesado (dedicado/urgente)
+export async function markDuplication(webhook_key) {
+    try {
+        const result = await pool.query(
+            `insert into webhook_duplication_check_only_support (webhook_key)
+            values ($1)
+             on conflict do nothing`, [webhook_key]
+        );
+        return result.rowCount > 0;
+    } catch (error) {
+        console.log(`erro ao registrar duplicação de ${webhook_key}: `, error.message);
+        return false
     }
 }

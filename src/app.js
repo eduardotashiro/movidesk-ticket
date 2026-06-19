@@ -1,7 +1,7 @@
 import figlet from "figlet"
 import { config } from "./config/env.js"
 import { ticketResolve } from "./events/reaction.js"
-import { ticketDedicated, ticketUrgentePo } from "./events/reaction.js"
+import { ticketDedicated, ticketUrgent } from "./events/reaction.js"
 import { ticket24hForClose } from "./events/reaction.js";
 import pkg from '@slack/bolt';
 const { App, ExpressReceiver, LogLevel } = pkg;
@@ -48,7 +48,7 @@ receiver.app.post("/webhook/urgente-notificado", async (req, res) => {
   const payload = req.body;
   console.log("Webhook recibido:", payload.Id);
   console.log("datos :", payload);
-  await ticketUrgentePo(app, payload);
+  await ticketUrgent(app, payload);
   return res.status(200).send("OK");
 });
 
