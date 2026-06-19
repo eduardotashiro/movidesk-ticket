@@ -1,7 +1,7 @@
 import { config } from "../config/env.js"
 import { uploadSlackFileToMovidesk } from "../utils/uploadFile.js"
 import { getOrCreatePerson } from "../services/persons.js"
-import { ticketCounter, catchMetadata, catchInfo, checkWebhookSent, markWebhookSent, checkDuplication, markDuplication } from "../db/dbQueries.js"
+import { ticketCounter, catchMetadata, catchInfo, checkWebhookSent, markWebhookSent, checkDuplication, markDuplication, checkTicketExists } from "../db/dbQueries.js"
 import { createTicket } from "../services/movidesk.js"
 import { parseMentions } from "../services/ticketProcessor.js"
 
@@ -18,6 +18,13 @@ export function registerTicketReaction(app) {
 
         // só reage se o emoji for SOS
         if (event.reaction !== "sos") return
+
+        const alreadyExists = await checkTicketExists(event.item.channel, event.item.ts)
+
+        if (alreadyExists) {
+            console.log(`Ticket já existe para a mensagem ${event.item.ts} no canal ${event.item.channel}. Ignorando.`)
+            return
+        }
 
         try {
             //incremeta o contador no bd
@@ -177,18 +184,7 @@ export function registerTicketReaction(app) {
             console.log("Ticket completo:", JSON.stringify(ticket, null, 2))
 
 
-            catchMetadata(ticket.id, placeholderTs, event.item.channel, messageAuthorId, ticket.protocol, linkMovidesk);
-
-
-
-            // Ticket completo: {
-            //   "id": 58896,
-            //   "protocol": "202601280001308"
-            // }
-
-
-            const fullTicket = await fetch(`${config.movidesk.urlCreateTicket}${config.movidesk.token}&id=${ticket.id}`)
-            console.log(fullTicket)
+            catchMetadata(ticket.id, placeholderTs, event.item.ts, event.item.channel, messageAuthorId, ticket.protocol, linkMovidesk);
 
 
             // Upload de arquivos, se tiver
@@ -440,11 +436,7 @@ export function registerTicketReaction(app) {
             console.log("Ticket completo:", JSON.stringify(ticket, null, 2))
 
             //chama func para insert
-            //chama func para insert
-            catchMetadata(ticket.id, metadata.button_ts, channel, messageAuthorId, ticket.protocol, linkMovidesk);
-
-            const fullTicket = await fetch(`${config.movidesk.urlCreateTicket}${config.movidesk.token}&id=${ticket.id}`)
-            console.log(fullTicket)
+            catchMetadata(ticket.id, metadata.button_ts, ts, channel, messageAuthorId, ticket.protocol, linkMovidesk);
 
 
             // Upload de arquivos, se tiver
@@ -535,9 +527,7 @@ export async function ticket24hForClose(app, webhook_ticket_id) {
 
 
 
-
 //Notificación de llamada dedicada
-
 export async function ticketDedicated(app, payload) {
     const ticket_id = payload.Id;
     const webhook_key = `dedicado-${ticket_id}`
@@ -549,12 +539,16 @@ export async function ticketDedicated(app, payload) {
             return
         }
 
+        const response = await fetch(`${config.movidesk.urlCreateTicket}${config.movidesk.token}&id=${ticket_id}`)
+        const fullTicket = await response.json()
+
+        const protocol = fullTicket.protocol || ticket_id
         const urgency = payload.Urgency || "Não especificada";
-        const movidesk_url = `${config.movidesk.urlTicketLink}${ticket_id}`;
+        const movidesk_url = `${config.movidesk.urlTicketLink}${protocol}`;
 
         await app.client.chat.postMessage({
             channel: config.slack.channel,
-            text: `:alert: *Novo Chamado Click Bus <${movidesk_url}|#${ticket_id}>*\n*Urgencia:* ${urgency}`
+            text: `:alert: Novo Chamado *CLICK BUS*\n\n*Ticket*: <${movidesk_url}|${protocol}>\n*Urgencia:* ${urgency}`
         });
         await markDuplication(webhook_key)
         console.log(`Notificación enviada al ticket. ${ticket_id}`);
@@ -564,7 +558,6 @@ export async function ticketDedicated(app, payload) {
 }
 
 //Notificación de llamada urgente
-
 export async function ticketUrgent(app, payload) {
     const ticket_id = payload.Id;
     const webhook_key = `urgente-${ticket_id}`
@@ -576,11 +569,17 @@ export async function ticketUrgent(app, payload) {
             return
         }
 
-        const movidesk_url = `${config.movidesk.urlTicketLink}${ticket_id}`;
+        const response = await fetch(`${config.movidesk.urlCreateTicket}${config.movidesk.token}&id=${ticket_id}`)
+        const fullTicket = await response.json()
+        
+        const organization = fullTicket.clients?.[0]?.organization?.businessName || "Organização não encontrada";
+        const protocol = fullTicket.protocol || ticket_id
+ 
+        const movidesk_url = `${config.movidesk.urlTicketLink}${protocol}`;
 
         await app.client.chat.postMessage({
             channel: config.slack.channel,
-            text: `:ahhhhhhhhh: *Novo Chamado URGENTE <${movidesk_url}|#${ticket_id}>*`
+            text: `:ahhhhhhhhh: Novo Chamado *URGENTE*\n\n*Ticket*: <${movidesk_url}|${protocol}>\n*Organização*: ${organization}`
         });
         await markDuplication(webhook_key)
         console.log(`Notificación enviada al ticket. ${ticket_id}`);

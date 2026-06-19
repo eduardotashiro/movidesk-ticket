@@ -30,12 +30,12 @@ export async function showMetrics() {
 }
 
 // pega metadados do ticket
-export async function catchMetadata(ticket_id, slack_thread_ts, slack_channel_id, user_id, protocol, threadContext) {
+export async function catchMetadata(ticket_id, slack_thread_ts,original_message_ts, slack_channel_id, user_id, protocol, threadContext) {
     try {
         await pool.query(
-            `insert into ticket_slack_metadata (ticket_id, slack_thread_ts, slack_channel_id, user_id, protocol, threadContext)		
-             values($1,$2,$3,$4,$5,$6)`,
-            [ticket_id, slack_thread_ts, slack_channel_id, user_id, protocol, threadContext]
+            `insert into ticket_slack_metadata (ticket_id, slack_thread_ts, original_message_ts, slack_channel_id, user_id, protocol, threadContext)		
+             values($1,$2,$3,$4,$5,$6,$7)`,
+            [ticket_id, slack_thread_ts, original_message_ts, slack_channel_id, user_id, protocol, threadContext]
         )
     } catch (error) {
         console.log(`erro ao pegar metadados do tkt:`, error.message)
@@ -116,6 +116,23 @@ export async function markDuplication(webhook_key) {
         return result.rowCount > 0;
     } catch (error) {
         console.log(`erro ao registrar duplicação de ${webhook_key}: `, error.message);
+        return false
+    }
+}
+
+// verifica si ya existe un ticket para ese mensaje del slack
+export async function checkTicketExists(slack_channel_id, original_message_ts) {
+    try {
+        const result = await pool.query(
+        `select 1
+         from ticket_slack_metadata
+         where slack_channel_id = $1
+         and original_message_ts = $2`,
+            [slack_channel_id, original_message_ts]
+        );
+        return result.rowCount > 0;
+    } catch (error) {
+        console.log(`erro ao checar ticket existente para canal ${slack_channel_id} e thread ${original_message_ts}: `, error.message);
         return false
     }
 }
