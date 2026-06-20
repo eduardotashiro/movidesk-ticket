@@ -4,6 +4,7 @@ import { getOrCreatePerson } from "../services/persons.js"
 import { ticketCounter, catchMetadata, catchInfo, checkWebhookSent, markWebhookSent, checkDuplication, markDuplication, checkTicketExists } from "../db/dbQueries.js"
 import { createTicket } from "../services/movidesk.js"
 import { parseMentions } from "../services/ticketProcessor.js"
+import { isFileAllowed } from "../utils/fileValidator.js"
 
 
 export function registerTicketReaction(app) {
@@ -117,7 +118,7 @@ export function registerTicketReaction(app) {
                         }
                     ]
                 })
-                return // entao aqui eu coloco tudo que esta la em baixo para pegar o file corretamente ??
+                return
             }
             // FIM NOVA FEAT
 
@@ -186,10 +187,23 @@ export function registerTicketReaction(app) {
 
             catchMetadata(ticket.id, placeholderTs, event.item.ts, event.item.channel, messageAuthorId, ticket.protocol, linkMovidesk);
 
-
-            // Upload de arquivos, se tiver
+            // Upload de arquivos, se tiver (apenas tipos permitidos)
             if (files.length > 0) {
-                await Promise.all(files.map((f) => uploadSlackFileToMovidesk(ticket.id, f)))
+                const allowedFiles = files.filter(isFileAllowed)
+                const rejectedFiles = files.filter((f) => !isFileAllowed(f))
+
+                if (rejectedFiles.length > 0) {
+                    const rejectedNames = rejectedFiles.map((f) => f.name).join(", ")
+                    await client.chat.postMessage({
+                        channel: event.item.channel,
+                        thread_ts: event.item.ts,
+                        text: `:warning: Os seguintes arquivos não puderam ser anexados por tipo não permitido:\n\`\`\`${rejectedNames}\`\`\``
+                    })
+                }
+
+                if (allowedFiles.length > 0) {
+                    await Promise.all(allowedFiles.map((f) => uploadSlackFileToMovidesk(ticket.id, f)))
+                }
             }
 
 
@@ -439,14 +453,25 @@ export function registerTicketReaction(app) {
             catchMetadata(ticket.id, metadata.button_ts, ts, channel, messageAuthorId, ticket.protocol, linkMovidesk);
 
 
-            // Upload de arquivos, se tiver
+            // Upload de arquivos, se tiver (apenas tipos permitidos)
             if (files.length > 0) {
-                console.log(`tentando fazer upload de ${files.length}, arquivos`)
-                await Promise.all(files.map((f) => uploadSlackFileToMovidesk(ticket.id, f)))
-                console.log(`upload finalizado!`)
-            } else {
-                console.log(`nenhum arquivo para upload`)
+                const allowedFiles = files.filter(isFileAllowed)
+                const rejectedFiles = files.filter((f) => !isFileAllowed(f))
+
+                if (rejectedFiles.length > 0) {
+                    const rejectedNames = rejectedFiles.map((f) => f.name).join(", ")
+                    await client.chat.postMessage({
+                        channel: channel,
+                        thread_ts: metadata.button_ts,
+                        text: `:warning: Os seguintes arquivos não puderam ser anexados por tipo não permitido:\n\`\`\`${rejectedNames}\`\`\``
+                    })
+                }
+
+                if (allowedFiles.length > 0) {
+                    await Promise.all(allowedFiles.map((f) => uploadSlackFileToMovidesk(ticket.id, f)))
+                }
             }
+
 
         } catch (error) {
             console.error("Erro ao criar o ticket:", error)
@@ -571,10 +596,10 @@ export async function ticketUrgent(app, payload) {
 
         const response = await fetch(`${config.movidesk.urlCreateTicket}${config.movidesk.token}&id=${ticket_id}`)
         const fullTicket = await response.json()
-        
+
         const organization = fullTicket.clients?.[0]?.organization?.businessName || "Organização não encontrada";
         const protocol = fullTicket.protocol || ticket_id
- 
+
         const movidesk_url = `${config.movidesk.urlTicketLink}${protocol}`;
 
         await app.client.chat.postMessage({
