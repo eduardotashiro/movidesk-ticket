@@ -1,5 +1,5 @@
-import {config} from "../config/env.js"
-import { getRelationships } from "../organization/relationships.js"
+import {config} from "../../config/env.js"
+import { getRelationships } from "../movidesk/organization/relationships.js"
 
 export async function getOrCreatePerson(email, name) {
 

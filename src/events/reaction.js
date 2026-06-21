@@ -1,10 +1,11 @@
 import { config } from "../config/env.js"
-import { uploadSlackFileToMovidesk } from "../utils/uploadFile.js"
-import { getOrCreatePerson } from "../services/persons.js"
+import { uploadSlackFileToMovidesk } from "../services/files/movideskFileClient.js"
+import { getOrCreatePerson } from "../services/movidesk/persons.js"
 import { ticketCounter, catchMetadata, catchInfo, checkWebhookSent, markWebhookSent, checkDuplication, markDuplication, checkTicketExists } from "../db/dbQueries.js"
-import { createTicket } from "../services/movidesk.js"
-import { parseMentions } from "../services/ticketProcessor.js"
-import { isFileAllowed } from "../utils/fileValidator.js"
+import { createTicket } from "../services/movidesk/movidesk.js"
+import { parseMentions } from "../services/movidesk/ticketProcessor.js"
+import { processFiles } from "../utils/files/fileProcessor.js"
+import { handleTicketAttachments } from "../services/files/attachmentService.js"
 
 
 export function registerTicketReaction(app) {
@@ -76,7 +77,7 @@ export function registerTicketReaction(app) {
 
             // Pega info do autor 
             const messageAuthorInfo = await client.users.info({ user: messageAuthorId })
-            const email = messageAuthorInfo.user.profile.email //`${Date.now()}@teste.com`  | undefined undefined// m
+            const email = messageAuthorInfo.user.profile.email //undefined//`${Date.now()}@teste.com`  //messageAuthorInfo.user.profile.email 
             const name = messageAuthorInfo.user.profile.real_name //
 
 
@@ -187,26 +188,14 @@ export function registerTicketReaction(app) {
 
             catchMetadata(ticket.id, placeholderTs, event.item.ts, event.item.channel, messageAuthorId, ticket.protocol, linkMovidesk);
 
-            // Upload de arquivos, se tiver (apenas tipos permitidos)
-            if (files.length > 0) {
-                const allowedFiles = files.filter(isFileAllowed)
-                const rejectedFiles = files.filter((f) => !isFileAllowed(f))
 
-                if (rejectedFiles.length > 0) {
-                    const rejectedNames = rejectedFiles.map((f) => f.name).join(", ")
-                    await client.chat.postMessage({
-                        channel: event.item.channel,
-                        thread_ts: event.item.ts,
-                        text: `:warning: Os seguintes arquivos não puderam ser anexados por tipo não permitido:\n\`\`\`${rejectedNames}\`\`\``
-                    })
-                }
-
-                if (allowedFiles.length > 0) {
-                    await Promise.all(allowedFiles.map((f) => uploadSlackFileToMovidesk(ticket.id, f)))
-                }
-            }
-
-
+            await handleTicketAttachments({
+                files,
+                ticketId: ticket.id,
+                client,
+                channel: event.item.channel,
+                threadTs: event.item.ts
+            });
 
         } catch (error) {
             console.error("Erro ao criar o ticket:", error)
@@ -453,25 +442,13 @@ export function registerTicketReaction(app) {
             catchMetadata(ticket.id, metadata.button_ts, ts, channel, messageAuthorId, ticket.protocol, linkMovidesk);
 
 
-            // Upload de arquivos, se tiver (apenas tipos permitidos)
-            if (files.length > 0) {
-                const allowedFiles = files.filter(isFileAllowed)
-                const rejectedFiles = files.filter((f) => !isFileAllowed(f))
-
-                if (rejectedFiles.length > 0) {
-                    const rejectedNames = rejectedFiles.map((f) => f.name).join(", ")
-                    await client.chat.postMessage({
-                        channel: channel,
-                        thread_ts: metadata.button_ts,
-                        text: `:warning: Os seguintes arquivos não puderam ser anexados por tipo não permitido:\n\`\`\`${rejectedNames}\`\`\``
-                    })
-                }
-
-                if (allowedFiles.length > 0) {
-                    await Promise.all(allowedFiles.map((f) => uploadSlackFileToMovidesk(ticket.id, f)))
-                }
-            }
-
+            await handleTicketAttachments({
+                files,
+                ticketId: ticket.id,
+                client,
+                channel: channel,
+                threadTs: metadata.button_ts
+            });
 
         } catch (error) {
             console.error("Erro ao criar o ticket:", error)
