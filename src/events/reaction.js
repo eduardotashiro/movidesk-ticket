@@ -1,5 +1,4 @@
 import { config } from "../config/env.js"
-import { uploadSlackFileToMovidesk } from "../services/files/movideskFileClient.js"
 import { getOrCreatePerson } from "../services/movidesk/persons.js"
 import { ticketCounter, catchMetadata, catchInfo, checkWebhookSent, markWebhookSent, checkDuplication, markDuplication, checkTicketExists } from "../db/dbQueries.js"
 import { createTicket } from "../services/movidesk/movidesk.js"
