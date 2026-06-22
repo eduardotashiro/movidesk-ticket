@@ -1,4 +1,4 @@
-import { processFiles } from "../../utils/files/fileProcessor.js";
+import { processFiles } from "./fileProcessor.js";
 import { uploadSlackFileToMovidesk } from "./movideskFileClient.js";
 
 export async function handleTicketAttachments({ files, ticketId, client, channel, threadTs }) {

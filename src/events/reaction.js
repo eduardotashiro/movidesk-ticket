@@ -1,9 +1,9 @@
 import { config } from "../config/env.js"
 import { getOrCreatePerson } from "../services/movidesk/persons.js"
 import { ticketCounter, catchMetadata, catchInfo, checkWebhookSent, markWebhookSent, checkDuplication, markDuplication, checkTicketExists } from "../db/dbQueries.js"
-import { createTicket } from "../services/movidesk/movidesk.js"
-import { parseMentions } from "../services/movidesk/ticketProcessor.js"
-import { processFiles } from "../utils/files/fileProcessor.js"
+import { createTicket } from "../services/movidesk/ticketService.js"
+import { parseMentions } from "../services/slack/mentionParser.js"
+import { processFiles } from "../services/files/fileProcessor.js"
 import { handleTicketAttachments } from "../services/files/attachmentService.js"
 
 
