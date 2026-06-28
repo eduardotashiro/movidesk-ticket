@@ -1,6 +1,6 @@
 //Requisições HTTP puras (GET, POST, PATCH) para o Movidesk
 
-import { config } from "../../config/env.js"
+import { config } from "../../../config/env.js"
 
 const TOKEN = config.movidesk.token
 const URL_CRUD_PERSON = config.movidesk.urlCrudPerson

@@ -1,4 +1,4 @@
-import { config } from "../../config/env.js"
+import { config } from "../../../config/env.js"
 
 const TOKEN = config.movidesk.token
 const URL_CREATE_TICKET = config.movidesk.urlCreateTicket
