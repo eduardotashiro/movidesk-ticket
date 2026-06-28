@@ -1,11 +1,11 @@
-import { showMetrics } from "../db/dbQueries.js"
-import {config} from "../config/env.js"
+import { getTotalTicketsCount } from "../db/queries/ticketMetrics.js";
+import { config } from "../config/env.js"
 
 export function homeTab(app) {
   app.event("app_home_opened", async ({ event, client }) => {
 
-    const metrics = await showMetrics()
-    const ticketCount= metrics.total_tickets
+    const metrics = await getTotalTicketsCount()
+    const ticketCount = metrics.total_tickets
 
     try {
       await client.views.publish({
@@ -22,7 +22,7 @@ export function homeTab(app) {
               type: "header",
               text: {
                 type: "plain_text",
-                text: `:tuna-bot: Total de Tickets: ${ticketCount} `, 
+                text: `:tuna-bot: Total de Tickets: ${ticketCount} `,
                 emoji: true,
               },
             },
@@ -33,7 +33,7 @@ export function homeTab(app) {
         },
       });
     } catch (error) {
-      console.warn("Opa, não conseguimos baixar o banner, mas relaxa, não vai crashar");
+      console.error("Erro ao publicar a Home Tab:", error.message);
     }
   })
 }

@@ -1,9 +1,10 @@
 import { config } from "../config/env.js"
 import { getOrCreatePerson } from "../services/movidesk/persons.js"
-import { ticketCounter, catchMetadata, catchInfo, checkWebhookSent, markWebhookSent, checkDuplication, markDuplication, checkTicketExists } from "../db/dbQueries.js"
+import {incrementTicketCounter} from "../db/queries/ticketMetrics.js"
+import {checkTicketExists, saveTicketMetadata, getTicketSlackInfo} from "../db/queries/ticketMetadata.js"
+import {checkWebhookSent, markWebhookSent,checkWebhookProcessed, markWebhookProcessed} from "../db/queries/webhooks.js"
 import { createTicket } from "../services/movidesk/ticketService.js"
 import { parseMentions } from "../services/slack/mentionParser.js"
-import { processFiles } from "../services/files/fileProcessor.js"
 import { handleTicketAttachments } from "../services/files/attachmentService.js"
 
 
@@ -29,7 +30,7 @@ export function registerTicketReaction(app) {
 
         try {
             //incremeta o contador no bd
-            await ticketCounter()
+            await incrementTicketCounter()
 
 
             //pega mensagem na thread // CHANNEL
@@ -185,7 +186,7 @@ export function registerTicketReaction(app) {
             console.log("Ticket completo:", JSON.stringify(ticket, null, 2))
 
 
-            catchMetadata(ticket.id, placeholderTs, event.item.ts, event.item.channel, messageAuthorId, ticket.protocol, linkMovidesk);
+            saveTicketMetadata(ticket.id, placeholderTs, event.item.ts, event.item.channel, messageAuthorId, ticket.protocol, linkMovidesk);
 
 
             await handleTicketAttachments({
@@ -438,7 +439,7 @@ export function registerTicketReaction(app) {
             console.log("Ticket completo:", JSON.stringify(ticket, null, 2))
 
             //chama func para insert
-            catchMetadata(ticket.id, metadata.button_ts, ts, channel, messageAuthorId, ticket.protocol, linkMovidesk);
+            saveTicketMetadata(ticket.id, metadata.button_ts, ts, channel, messageAuthorId, ticket.protocol, linkMovidesk);
 
 
             await handleTicketAttachments({
@@ -470,7 +471,7 @@ export function registerTicketReaction(app) {
 
 // verifica si el webhook de resolución ya fue enviado
 export async function ticketResolve(app, webhook_ticket_id) {
-    const resultDB = await catchInfo(webhook_ticket_id)
+    const resultDB = await getTicketSlackInfo(webhook_ticket_id)
     const check = await checkWebhookSent(webhook_ticket_id, 'webhook_resolve_sent')
     try {
         if (!resultDB) {
@@ -500,7 +501,7 @@ export async function ticketResolve(app, webhook_ticket_id) {
 
 // marca la notificación de 24 horas como enviada
 export async function ticket24hForClose(app, webhook_ticket_id) {
-    const resultDB = await catchInfo(webhook_ticket_id)
+    const resultDB = await getTicketSlackInfo(webhook_ticket_id)
     const check = await checkWebhookSent(webhook_ticket_id, 'webhook_24h_sent')
     try {
         if (!resultDB) {
@@ -533,7 +534,7 @@ export async function ticketDedicated(app, payload) {
     const ticket_id = payload.Id;
     const webhook_key = `dedicado-${ticket_id}`
     try {
-        const isDuplicate = await checkDuplication(webhook_key)
+        const isDuplicate = await checkWebhookProcessed(webhook_key)
 
         if (isDuplicate) {
             console.log(`Webhook de dedicado para o ticket ${ticket_id} já foi processado antes. Ignorando.`)
@@ -551,7 +552,7 @@ export async function ticketDedicated(app, payload) {
             channel: config.slack.channel,
             text: `:alert: Novo Chamado *CLICK BUS*\n\n*Ticket*: <${movidesk_url}|${protocol}>\n*Urgencia:* ${urgency}`
         });
-        await markDuplication(webhook_key)
+        await markWebhookProcessed(webhook_key)
         console.log(`Notificación enviada al ticket. ${ticket_id}`);
     } catch (error) {
         console.error("Error al enviar la notificación:", error.message);
@@ -563,7 +564,7 @@ export async function ticketUrgent(app, payload) {
     const ticket_id = payload.Id;
     const webhook_key = `urgente-${ticket_id}`
     try {
-        const isDuplicate = await checkDuplication(webhook_key)
+        const isDuplicate = await checkWebhookProcessed(webhook_key)
 
         if (isDuplicate) {
             console.log(`Webhook de urgente para o ticket ${ticket_id} já foi processado antes. Ignorando.`)
@@ -582,7 +583,7 @@ export async function ticketUrgent(app, payload) {
             channel: config.slack.channel,
             text: `:ahhhhhhhhh: Novo Chamado *URGENTE*\n\n*Ticket*: <${movidesk_url}|${protocol}>\n*Organização*: ${organization}`
         });
-        await markDuplication(webhook_key)
+        await markWebhookProcessed(webhook_key)
         console.log(`Notificación enviada al ticket. ${ticket_id}`);
     } catch (error) {
         console.error("Error al enviar la notificación:", error.message);
