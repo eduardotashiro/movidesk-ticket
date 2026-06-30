@@ -6,10 +6,13 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "testes": "ngrok http 3000"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "tunnel": "ngrok http 3000"
   },
   "keywords": [
-    "slack , movidesk"
+    "slack",
+    "movidesk"
   ],
   "author": "Eduardo Tashiro",
   "license": "ISC",
@@ -23,7 +26,8 @@
   },
   "devDependencies": {
     "ngrok": "^5.0.0-beta.2",
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.10",
+    "vitest": "^4.1.9"
   },
   "engines": {
     "node": ">=18"
