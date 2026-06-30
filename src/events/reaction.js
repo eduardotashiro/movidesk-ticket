@@ -550,7 +550,7 @@ export async function ticketDedicated(app, payload) {
 
         await app.client.chat.postMessage({
             channel: config.slack.channel,
-            text: `:alert: Novo Chamado *CLICK BUS*\n\n*Ticket*: <${movidesk_url}|${protocol}>\n*Urgencia:* ${urgency}`
+            text: `:alert: Novo Chamado *CLICK BUS*\n\n*Ticket*: <${movidesk_url}|${protocol}>\n*Urgência:* ${urgency}`
         });
         await markWebhookProcessed(webhook_key)
         console.log(`Notificación enviada al ticket. ${ticket_id}`);
