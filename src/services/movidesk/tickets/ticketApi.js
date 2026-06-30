@@ -3,7 +3,7 @@ import { config } from "../../../config/env.js"
 const TOKEN = config.movidesk.token
 const URL_CREATE_TICKET = config.movidesk.urlCreateTicket
 
-export async function postTicket(ticketBody) {
+export async function createTicketRequest(ticketBody) {
     const response = await fetch(`${URL_CREATE_TICKET}${TOKEN}`, {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },

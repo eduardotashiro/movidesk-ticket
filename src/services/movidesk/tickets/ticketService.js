@@ -1,26 +1,26 @@
-import {postTicket} from "./clients/movideskTicketClient.js"
+import { createTicketRequest } from "./ticketApi.js"
 
-export async function createTicket({ clientId, assunto, descricao, threadContext }) { 
+export async function createTicket({ clientId, assunto, descricao, threadContext }) {
 
     //payload & partner cria o ticket, ajuda a liderança com as métricas e contabiliza quantidade e assunto de cada ticket
     const ticketBody = {
         type: 2,
         subject: assunto,
         category: null,
-        serviceFirstLevelId:null,
-        serviceFirstLevel:null,
-        serviceSecondLevel:null,
-        serviceThirdLevel:null,
+        serviceFirstLevelId: null,
+        serviceFirstLevel: null,
+        serviceSecondLevel: null,
+        serviceThirdLevel: null,
         urgency: "Média",
         status: "Novo",
         createdBy:
         {
-            id: clientId, 
-           
+            id: clientId,
+
         },
         clients: [
             {
-                id: clientId,        
+                id: clientId,
             }
         ],
         actions: [
@@ -30,7 +30,7 @@ export async function createTicket({ clientId, assunto, descricao, threadContext
                 description: descricao,
                 createdBy:
                 {
-                    id: clientId, 
+                    id: clientId,
                 }
             },
             {
@@ -39,12 +39,14 @@ export async function createTicket({ clientId, assunto, descricao, threadContext
                 description: threadContext,
                 createdBy:
                 {
-                    id: clientId, 
+                    id: clientId,
                 }
             }
         ]
     }
 
-      return await postTicket(ticketBody)
+    const result = await createTicketRequest(ticketBody)
+    
+    return result
 }
 

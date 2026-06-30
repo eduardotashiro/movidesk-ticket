@@ -1,5 +1,5 @@
-import { getRelationships } from "./clientOrganizations/relationships.js"
-import { findMovideskPersonByEmail, findMovideskPersonByUserName, createMovideskPerson, updateMovideskPerson } from "./clients/movideskApiClient.js"
+import { getRelationships } from "../organizations/relationshipResolver.js"
+import { findMovideskPersonByEmail, findMovideskPersonByUserName, createMovideskPerson, updateMovideskPerson } from "./personApi.js"
 
 //ORQUESTRAÇÃO: Busca, cria, vincula org e reativa pessoas
 export async function getOrCreatePerson(email, name) {

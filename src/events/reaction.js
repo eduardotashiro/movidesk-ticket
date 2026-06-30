@@ -1,11 +1,11 @@
 import { config } from "../config/env.js"
-import { getOrCreatePerson } from "../services/movidesk/persons.js"
+import { getOrCreatePerson } from "../services/movidesk/people/personService.js"
 import {incrementTicketCounter} from "../db/queries/ticketMetrics.js"
 import {checkTicketExists, saveTicketMetadata, getTicketSlackInfo} from "../db/queries/ticketMetadata.js"
 import {checkWebhookSent, markWebhookSent,checkWebhookProcessed, markWebhookProcessed} from "../db/queries/webhooks.js"
-import { createTicket } from "../services/movidesk/ticketService.js"
+import { createTicket } from "../services/movidesk/tickets/ticketService.js"
 import { parseMentions } from "../services/slack/mentionParser.js"
-import { handleTicketAttachments } from "../services/files/attachmentService.js"
+import { handleTicketAttachments } from "../services/files/attachments.js"
 
 
 export function registerTicketReaction(app) {

@@ -1,5 +1,5 @@
-import { processFiles } from "./fileProcessor.js";
-import { uploadSlackFileToMovidesk } from "./movideskFileClient.js";
+import { processFiles } from "./attachmentFilter.js";
+import { uploadSlackFileToMovidesk } from "./attachmentUploader.js";
 
 export async function handleTicketAttachments({ files, ticketId, client, channel, threadTs }) {
     if (!files || files.length === 0) return;
