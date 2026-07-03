@@ -1,5 +1,5 @@
 import { config } from "../config/env.js"
-import { getOrCreatePerson } from "../services/movidesk/people/personService.js"
+import { syncMovideskPerson } from "../services/movidesk/people/personService.js"
 import {incrementTicketCounter} from "../db/queries/ticketMetrics.js"
 import {checkTicketExists, saveTicketMetadata, getTicketSlackInfo} from "../db/queries/ticketMetadata.js"
 import {checkWebhookSent, markWebhookSent,checkWebhookProcessed, markWebhookProcessed} from "../db/queries/webhooks.js"
@@ -132,7 +132,7 @@ export function registerTicketReaction(app) {
 
 
             //busca, se der false, cria ! 
-            const movideskId = await getOrCreatePerson(email, name)
+            const movideskId = await syncMovideskPerson(email, name)
 
             console.log("msg dentro da thread", originalMessage.ts)
             console.log("msg raiz da thread:", originalMessage.thread_ts)
@@ -390,7 +390,7 @@ export function registerTicketReaction(app) {
             const userInfo = await client.users.info({ user: messageAuthorId })
             const name = userInfo.user.profile.real_name
             //busca, se der false, cria ! 
-            const movideskId = await getOrCreatePerson(email, name)
+            const movideskId = await syncMovideskPerson(email, name)
 
             console.log("msg dentro da thread", originalMessage.ts)
             console.log("msg raiz da thread:", originalMessage.thread_ts)
