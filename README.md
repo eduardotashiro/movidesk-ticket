@@ -1,29 +1,42 @@
-# TUNA x SUPORTE — Movidesk Ticket Bot
+# TUNA x SUPORTE - Movidesk Ticket Bot 🆘
+
+![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express-5.x-black?logo=express)
+![Slack Bolt](https://img.shields.io/badge/Slack-Bolt-4A154B?logo=slack)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Railway-blue?logo=postgresql)
+![Vitest](https://img.shields.io/badge/Tested_with-Vitest-6E9F18?logo=vitest)
+![License](https://img.shields.io/badge/license-MIT-green)
 
 Bot de Slack que integra o time de suporte da Tuna Pagamentos ao Movidesk.
 Qualquer pessoa no workspace pode abrir um ticket de suporte reagindo com
-`:sos:` em uma mensagem — o bot cria o chamado no Movidesk automaticamente,
+🆘 em uma mensagem - o bot cria o chamado no Movidesk automaticamente,
 sem sair do Slack.
 
 ## Funcionalidades
 
 - **Criação de ticket por reação**: reagir com `:sos:` em qualquer mensagem
   (ou thread) abre um ticket no Movidesk com o conteúdo da mensagem.
+
 - **Coleta de e-mail via modal**: se o autor da mensagem não tem e-mail
   cadastrado no Slack, o bot pede via um modal antes de criar o ticket.
+
 - **Anexos**: arquivos anexados à mensagem original são enviados junto ao
-  ticket — com validação de extensão permitida e tamanho máximo (20MB).
+  ticket - com validação de extensão permitida e tamanho máximo (20 MB).
   Arquivos rejeitados são listados numa mensagem de aviso, sem travar a
   criação do ticket.
+
 - **Vínculo automático de organização**: o e-mail do usuário é usado para
   identificar a empresa/relacionamento no Movidesk (ex: domínio
-  `@angeloni.com.br` vincula automaticamente à organização Angeloni).
+  `@empresa.com.br` vincula automaticamente à organização da empresa).
+
 - **Notificações automáticas** (via webhook do Movidesk): o bot avisa no
   Slack quando um ticket é resolvido, quando passa 24h sem resposta do
   cliente, e alerta o canal de suporte sobre chamados dedicados/urgentes.
   Veja [`docs/API.md`](docs/API.md) para detalhes de cada endpoint.
+
 - **Home Tab**: mostra o total de tickets abertos pelo bot direto na aba
   Home do app no Slack.
+
 - **Prevenção de duplicidade**: reagir duas vezes na mesma mensagem não
   cria um segundo ticket; notificações de webhook também não são reenviadas.
 
@@ -93,12 +106,12 @@ src/
 │   └── queries/                 # uma responsabilidade por arquivo
 │       ├── ticketMetadata.js    # vínculo ticket <-> thread do Slack
 │       ├── ticketMetrics.js     # contador global de tickets
-│       └── webhookStatus.js     # controle de duplicidade de notificações
+│       └── webhookStatus.js     # controle de duplicidade de notificações & notificações no canal do ONLY
 └── services/
     ├── slack/                  # utilidades específicas do Slack
     │   ├── mentionParser.js     # resolve <@ID> pra nome real
     │   ├── messageValidator.js  # detecta mensagem só-arquivo / só-emoji
-    │   └── threadContext.js     # monta link da thread pro ticket
+    │   └── threadContext.js     # monta link da thread pro ticket no Movidesk
     ├── files/                  # validação e upload de anexos
     │   ├── fileValidator.js
     │   ├── attachmentFilter.js
@@ -110,7 +123,7 @@ src/
     │   └── organizations/
     │       └── relationshipResolver.js  # domínio de e-mail -> organização
     └── ticketFlow/
-        └── createTicketFromSlackMessage.js  # orquestra o fluxo completo de criação
+        └── createTicketFromSlackMessage.js  # orquestra o fluxo completo de criação do tkt
 ```
 
 **Padrão adotado**: módulos que fazem chamada HTTP externa são separados em
@@ -120,10 +133,10 @@ seguindo o exemplo de `movidesk/people/` e `movidesk/tickets/`.
 ## Stack
 
 - Node.js (ESM) + Express
-- [Slack Bolt](https://slack.dev/bolt-js/) — framework oficial de apps Slack
-- PostgreSQL ([`pg`](https://node-postgres.com/)) — hospedado no Railway
-- [Vitest](https://vitest.dev/) — testes unitários
-- Movidesk API — helpdesk onde os tickets são criados/gerenciados
+- [Slack Bolt](https://slack.dev/bolt-js/) - framework oficial de apps Slack
+- PostgreSQL ([`pg`](https://node-postgres.com/)) - hospedado no Railway
+- [Vitest](https://vitest.dev/) - testes unitários
+- Movidesk API - helpdesk onde os tickets são criados/gerenciados
 
 ## Pré-requisitos
 
@@ -190,8 +203,16 @@ Veja [`.env.example`](.env.example) para a lista completa. Os grupos principais:
 
 ## Documentação adicional
 
-- [`docs/API.md`](docs/API.md) — endpoints de webhook, payloads e exemplos de teste com `curl`
+- [`docs/API.md`](docs/API.md) - endpoints de webhook, payloads e exemplos de teste com `curl`
+
+## Referências
+
+- [Ticket API](https://atendimento.movidesk.com/kb/pt-br/article/256/movidesk-ticket-api)  
+
+- [Person API](https://atendimento.movidesk.com/kb/pt-br/article/189/movidesk-person-api)  
+
+- [Attachments API](https://atendimento.movidesk.com/kb/pt-br/article/518585/api-de-anexos)
 
 ## Autor
 
-Eduardo Tashiro — [github.com/eduardotashiro](https://github.com/eduardotashiro)
+Eduardo Tashiro - [github.com/eduardotashiro](https://github.com/eduardotashiro)
