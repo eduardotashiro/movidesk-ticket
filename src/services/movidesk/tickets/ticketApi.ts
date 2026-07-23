@@ -1,12 +1,13 @@
 import { config } from "../../../config/env.js"
+import type { TicketResponse } from "../../../types/movidesk.js"
 
 const TOKEN = config.movidesk.token
 const URL_CREATE_TICKET = config.movidesk.urlCreateTicket
 
-export async function createTicketRequest(ticketBody) {
+export async function createTicketRequest(ticketBody: Record<string, unknown>): Promise<TicketResponse> {
     const response = await fetch(`${URL_CREATE_TICKET}${TOKEN}`, {
         method: "POST",
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(ticketBody),
     })
 

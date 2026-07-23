@@ -1,16 +1,13 @@
+import type { App } from "@slack/bolt"
 import { incrementTicketCounter } from "../db/queries/ticketMetrics.js"
 import { checkTicketExists } from "../db/queries/ticketMetadata.js"
 import { parseMentions } from "../services/slack/mentionParser.js"
 import { isOnlyFiles, isOnlyEmojis } from "../services/slack/messageValidator.js"
 import { createTicketFromSlackMessage } from "../services/ticketFlow/createTicketFromSlackMessage.js"
+import type { SlackFile, SlackMessage } from "../types/slack.js"
 
-export function registerReactionHandler(app) {
+export function registerReactionHandler(app: App): void {
     app.event("reaction_added", async ({ event, client }) => {
-        // console.log("----REAÇÃO FEITA!-----")
-        // console.log("Usuário:", event.user)
-        // console.log("Emoji:", event.reaction)
-        // console.log("Mensagem:", event.item)
-        // console.log("----------------------")
 
         if (event.reaction !== "sos") return
 
@@ -21,7 +18,7 @@ export function registerReactionHandler(app) {
             return
         }
 
-        let placeholderTs
+        let placeholderTs: string | undefined
 
         try {
             await incrementTicketCounter()
@@ -31,9 +28,9 @@ export function registerReactionHandler(app) {
                 ts: event.item.ts,
             })
 
-            const originalMessage = result.messages[0]
+            const originalMessage = result.messages?.[0] as SlackMessage
             let text = originalMessage.text
-            const files = originalMessage.files || []
+            const files = (originalMessage.files ?? []) as SlackFile[]
             const messageAuthorId = originalMessage.user
 
             text = await parseMentions(text, client)
@@ -56,11 +53,11 @@ export function registerReactionHandler(app) {
             }
 
             const messageAuthorInfo = await client.users.info({ user: messageAuthorId })
-            const email = messageAuthorInfo.user.profile.email
-            const name = messageAuthorInfo.user.profile.real_name
+            const email = messageAuthorInfo.user?.profile?.email
+            const name = messageAuthorInfo.user?.profile?.real_name ?? ""
 
             // si el usuario no tiene email registrado en slack, se le pide vía modal
-            if (!email || email === undefined) {
+            if (!email) {
                 await client.chat.postMessage({
                     channel: event.item.channel,
                     thread_ts: event.item.ts,
@@ -106,7 +103,7 @@ export function registerReactionHandler(app) {
             await createTicketFromSlackMessage({
                 client,
                 channel: event.item.channel,
-                updateTs: placeholderTs,
+                updateTs: placeholderTs as string,
                 attachmentsThreadTs: event.item.ts,
                 messageAuthorId,
                 email,

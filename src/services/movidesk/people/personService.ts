@@ -1,28 +1,21 @@
 import { getRelationships } from "../organizations/relationshipResolver.js"
-import { findMovideskPersonByEmail, findMovideskPersonByUserName, createMovideskPerson, updateMovideskPerson } from "./personApi.js"
+import {findMovideskPersonByEmail, findMovideskPersonByUserName, createMovideskPerson, updateMovideskPerson} from "./personApi.js"
 
+import type { MovideskPerson } from "../../../types/movidesk.js"
 
-
-// Si el correo está en userName y el campo email está vacío, actualizar el registro con el correo en el campo correcto
-async function fixMisplacedEmail(personId, email) {
-    await updateMovideskPerson(personId,
-        {
-            emails: 
-            [
-                {
-                    emailType: "Pessoal",
-                    email: email,
-                    isDefault: true
-                }
-            ]
-        }
-    )
+async function fixMisplacedEmail(personId: number, email: string): Promise<void> {
+    await updateMovideskPerson(personId, {
+        emails: [
+            {
+                emailType: "Pessoal",
+                email: email,
+                isDefault: true
+            }
+        ]
+    })
 }
 
-
-
-
-function buildNewPersonPayload(email, name, relationships) {
+function buildNewPersonPayload(email: string, name: string, relationships: ReturnType<typeof getRelationships>) {
     return {
         isActive: true,
         personType: 1,
@@ -32,51 +25,36 @@ function buildNewPersonPayload(email, name, relationships) {
         userName: email,
         cultureId: "pt-BR",
         timeZoneId: "America/Sao_Paulo",
-        emails:
-            [
-                {
-                    emailType: "Pessoal",
-                    email: email,
-                    isDefault: true
-                }
-            ],
+        emails: [
+            {
+                emailType: "Pessoal",
+                email: email,
+                isDefault: true
+            }
+        ],
         relationships
     }
 }
 
-
-
-async function syncOrganization(person, email) {
-    const hasOrganization = person.relationships?.length > 0
+async function syncOrganization(person: MovideskPerson, email: string): Promise<void> {
+    const hasOrganization = (person.relationships?.length ?? 0) > 0
     if (hasOrganization) return
 
     const relationships = getRelationships(email)
-    await updateMovideskPerson(person.id, 
-        { 
-            relationships
-        }
-    )
+    await updateMovideskPerson(person.id, { relationships })
 
     person.relationships = relationships
 }
 
+async function activatePerson(person: MovideskPerson): Promise<void> {
+    if (person.isActive) return
 
-
-async function activatePerson(person) {
-    const isActive = person.isActive
-    if (isActive) return
-
-    await updateMovideskPerson(person.id, 
-        { 
-            isActive: true 
-        }
-    )
+    await updateMovideskPerson(person.id, { isActive: true })
     person.isActive = true
 }
 
-
 // sincroniza la persona en el Movidesk / busca, corrige, crea, vincula organización y reactiva cuando es necesario
-export async function syncMovideskPerson(email, name) {
+export async function syncMovideskPerson(email: string, name: string): Promise<number> {
     const emailMatches = await findMovideskPersonByEmail(email)
 
     if (emailMatches?.length > 0) {
@@ -87,7 +65,6 @@ export async function syncMovideskPerson(email, name) {
         return person.id
     }
 
-    //si,muchos campos UserName están mal, pero es lo que tenemos para buscar personas que no tienen email registrado en movidesk weon
     const userNameMatches = await findMovideskPersonByUserName(email)
 
     if (userNameMatches?.length > 0) {

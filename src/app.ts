@@ -1,0 +1,33 @@
+import figlet from "figlet"
+import pkg, { type App as AppType, type ExpressReceiver as ExpressReceiverType } from "@slack/bolt"
+import express from "express"
+import { config } from "./config/env.js"
+import { registerReactionHandler } from "./events/reactionHandler.js"
+import { registerEmailModal } from "./events/emailModal.js"
+import { homeTab } from "./events/appHome.js"
+import { webhookRoutes } from "./routes/webhookRoutes.js"
+import { printBanner } from "./utils/banner.js"
+
+const { App, ExpressReceiver, LogLevel } = pkg
+
+export const receiver: ExpressReceiverType = new ExpressReceiver({
+    signingSecret: config.slack.signingSecret as string,
+    // clientId e clientSecret OAuth flow (multi-workspace)
+    // clientId: config.slack.clientID,
+    // clientSecret: config.slack.clientSecret,
+})
+
+export const app: AppType = new App({
+    receiver,
+    logLevel: LogLevel.INFO,
+    token: config.slack.botToken
+})
+
+receiver.app.use(express.json())
+
+webhookRoutes(receiver, app)
+registerReactionHandler(app)
+registerEmailModal(app)
+homeTab(app)
+
+printBanner("TUNA   x   SUPORTE ")

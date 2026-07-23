@@ -1,8 +1,9 @@
 import { createTicketRequest } from "./ticketApi.js"
+import type { CreateTicketInput, TicketResponse } from "../../../types/movidesk.js"
 
-export async function createTicket({ clientId, assunto, descricao, threadContext }) {
+export async function createTicket({ clientId, assunto, descricao, threadContext }: CreateTicketInput): Promise<TicketResponse> {
 
-    // payload también ayuda julio con las métricas: cuenta cantidad y asunto de cada ticket
+    // payload también ayuda con las métricas: cuenta cantidad y asunto de cada ticket
     const ticketBody = {
         type: 2,
         subject: assunto,
@@ -13,10 +14,8 @@ export async function createTicket({ clientId, assunto, descricao, threadContext
         serviceThirdLevel: null,
         urgency: "Média",
         status: "Novo",
-        createdBy:
-        {
+        createdBy: {
             id: clientId,
-
         },
         clients: [
             {
@@ -28,8 +27,7 @@ export async function createTicket({ clientId, assunto, descricao, threadContext
                 type: 2,
                 origin: 9,
                 description: descricao,
-                createdBy:
-                {
+                createdBy: {
                     id: clientId,
                 }
             },
@@ -37,16 +35,12 @@ export async function createTicket({ clientId, assunto, descricao, threadContext
                 type: 1,
                 origin: 9,
                 description: threadContext,
-                createdBy:
-                {
+                createdBy: {
                     id: clientId,
                 }
             }
         ]
     }
 
-    const result = await createTicketRequest(ticketBody)
-    
-    return result
+    return await createTicketRequest(ticketBody)
 }
-

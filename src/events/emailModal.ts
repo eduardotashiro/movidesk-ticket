@@ -1,24 +1,26 @@
+import type { App } from "@slack/bolt"
 import { parseMentions } from "../services/slack/mentionParser.js"
 import { isOnlyFiles, isOnlyEmojis } from "../services/slack/messageValidator.js"
 import { createTicketFromSlackMessage } from "../services/ticketFlow/createTicketFromSlackMessage.js"
+import type { EmailButtonActionBody, EmailModalViewSubmission, EmailModalMetadata, SlackFile, SlackMessage } from "../types/slack.js"
 
 // el action_id "pega_email_btn" es disparado desde events/reactionHandler.js
-export function registerEmailModal(app) {
+export function registerEmailModal(app: App): void {
     app.action("pega_email_btn", async ({ ack, body, client }) => {
         await ack()
-        const originalTs = body.message.metadata.event_payload.original_message_ts
 
-        const metadata = {
-            channel: body.channel.id,
-            button_ts: body.message.ts,
+        const actionBody = body as unknown as EmailButtonActionBody
+        const originalTs = actionBody.message.metadata.event_payload.original_message_ts
+
+        const metadata: EmailModalMetadata = {
+            channel: actionBody.channel.id,
+            button_ts: actionBody.message.ts,
             ts: originalTs,
-            messageAuthorId: body.user.id
+            messageAuthorId: actionBody.user.id
         }
 
-       // console.log("ACTION BODY:", JSON.stringify(body, null, 2))
-
         await client.views.open({
-            trigger_id: body.trigger_id,
+            trigger_id: actionBody.trigger_id,
             view: {
                 type: "modal",
                 callback_id: "email_modal",
@@ -61,33 +63,29 @@ export function registerEmailModal(app) {
     app.view("email_modal", async ({ ack, view, client }) => {
         await ack()
 
+        const viewSubmission = view as unknown as EmailModalViewSubmission
+        let metadata: EmailModalMetadata | undefined
+
         try {
-            const metadata = JSON.parse(view.private_metadata)
-            const vsv = view.state.values
-            const email = vsv.email_block.email_input.value
-            const { channel, ts, messageAuthorId } = metadata
+            metadata = JSON.parse(viewSubmission.private_metadata)
+            const email = viewSubmission.state.values.email_block.email_input.value
+            const { channel, ts, messageAuthorId } = metadata as EmailModalMetadata
 
             const result = await client.conversations.replies({
                 channel: channel,
                 ts: ts,
             })
 
-            const originalMessage = result.messages[0]
+            const originalMessage = result.messages?.[0] as SlackMessage
             let text = originalMessage.text
-            const files = originalMessage.files || []
-
-            // console.log(`----------------------`)
-            // console.log(`Quantidade de arquivos, ${files.length}`)
-            // console.log(`arquivos completos, ${JSON.stringify(files, null, 2)}`)
-            // console.log(`mensagem original completa ${JSON.stringify(originalMessage, null, 2)}`)
-            // console.log(`----------------------`)
+            const files = (originalMessage.files ?? []) as SlackFile[]
 
             text = await parseMentions(text, client)
 
             if (isOnlyFiles(text, files)) {
                 await client.chat.postMessage({
                     channel: channel,
-                    thread_ts: metadata.button_ts,
+                    thread_ts: metadata!.button_ts,
                     text: `Olá <@${messageAuthorId}>,\n\nAinda não consigo criar Ticket no Suporte apenas com arquivos. :sweat_smile:\n\nPor favor tente novamente em uma mensagem que contenha textos também.`
                 })
                 return
@@ -95,7 +93,7 @@ export function registerEmailModal(app) {
             } else if (isOnlyEmojis(text)) {
                 await client.chat.postMessage({
                     channel: channel,
-                    thread_ts: metadata.button_ts,
+                    thread_ts: metadata!.button_ts,
                     text: `Olá <@${messageAuthorId}>,\n\nAinda não consigo criar Ticket no Suporte apenas com emojis. :sweat_smile:\n\nPor favor tente novamente em uma mensagem que contenha textos também.`
                 })
                 return
@@ -103,18 +101,18 @@ export function registerEmailModal(app) {
 
             await client.chat.update({
                 channel: channel,
-                ts: metadata.button_ts,
+                ts: metadata!.button_ts,
                 text: `Olá <@${messageAuthorId}> :wave::skin-tone-4: \n\nSeu ticket esta sendo criado ... `
             })
 
             const userInfo = await client.users.info({ user: messageAuthorId })
-            const name = userInfo.user.profile.real_name
+            const name = userInfo.user?.profile?.real_name ?? ""
 
             await createTicketFromSlackMessage({
                 client,
                 channel,
-                updateTs: metadata.button_ts,
-                attachmentsThreadTs: metadata.button_ts,
+                updateTs: metadata!.button_ts,
+                attachmentsThreadTs: metadata!.button_ts,
                 messageAuthorId,
                 email,
                 name,
@@ -126,10 +124,10 @@ export function registerEmailModal(app) {
         } catch (error) {
             console.error("Erro ao criar o ticket:", error)
 
-            const metadata = JSON.parse(view.private_metadata)
+            const fallbackMetadata = metadata ?? JSON.parse(viewSubmission.private_metadata) as EmailModalMetadata
             await client.chat.postMessage({
-                channel: metadata.channel,
-                thread_ts: metadata.button_ts,
+                channel: fallbackMetadata.channel,
+                thread_ts: fallbackMetadata.button_ts,
                 text: `:warning: Ocorreu um problema ao criar seu ticket.\n\nNossa equipe já foi notificada e vamos resolver em breve.\n\nPor favor, tente novamente mais tarde.`,
             })
         }
