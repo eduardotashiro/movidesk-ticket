@@ -57,8 +57,8 @@ export const config = {
       name: process.env.SUPERNOSSO_NAME
     },
     incomm: {
-      id: process.env.INCOMMERCE_ID,
-      name: process.env.INCOMMERCE_NAME
+      id: process.env.INCOMM_ID,
+      name: process.env.INCOMM_NAME
     },
     gruposc: {
       id: process.env.GRUPOSC_ID,

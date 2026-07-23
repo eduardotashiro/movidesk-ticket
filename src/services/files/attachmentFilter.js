@@ -7,8 +7,8 @@ export function processFiles(files) {
     const rejectedDetails = rejectedFiles.map((f) => {
         const reasons = []
         if (!isFileAllowed(f)) reasons.push("extensão não permitida")
-        if (!isFileSizeAllowed(f)) reasons.push("acima de 20MB")
-        return `${f.name} (${reasons.join(" e ")})`
+        if (!isFileSizeAllowed(f)) reasons.push("acima de 20 MB")
+        return `• ${f.name} (${reasons.join(" e ")})`
     }).join("\n")
 
     return {

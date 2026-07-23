@@ -10,7 +10,7 @@ export async function handleTicketAttachments({ files, ticketId, client, channel
         await client.chat.postMessage({
             channel: channel,
             thread_ts: threadTs,
-            text: `:warning: Os seguintes arquivos não puderam ser anexados:\n\`\`\`${rejectedDetails}\`\`\``
+            text: `:warning: Não foi possível anexar os seguintes arquivos:\n\`\`\`${rejectedDetails}\`\`\``
         });
     }
 

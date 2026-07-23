@@ -75,7 +75,7 @@ async function activatePerson(person) {
 }
 
 
-// ORQUESTRAÇÃO: sincroniza a pessoa no Movidesk — busca, corrige, cria, vincula organização e reativa quando necessário.
+// sincroniza la persona en el Movidesk / busca, corrige, crea, vincula organización y reactiva cuando es necesario
 export async function syncMovideskPerson(email, name) {
     const emailMatches = await findMovideskPersonByEmail(email)
 
@@ -87,6 +87,7 @@ export async function syncMovideskPerson(email, name) {
         return person.id
     }
 
+    //si,muchos campos UserName están mal, pero es lo que tenemos para buscar personas que no tienen email registrado en movidesk weon
     const userNameMatches = await findMovideskPersonByUserName(email)
 
     if (userNameMatches?.length > 0) {

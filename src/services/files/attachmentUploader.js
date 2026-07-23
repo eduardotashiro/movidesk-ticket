@@ -2,7 +2,7 @@ import { config } from "../../config/env.js";
 
 export async function uploadSlackFileToMovidesk(ticketId, file) {
     
-    // Baixa arquivo do Slack
+    // descarga el archivo desde Slack
     const slackResponse = await fetch(file.url_private, { 
         headers: 
         {
@@ -15,7 +15,7 @@ export async function uploadSlackFileToMovidesk(ticketId, file) {
     const formData = new FormData()
     formData.append("file", await slackResponse.blob(), file.name) 
     
-    // Envia arquivo para Movidesk
+    // sube el archivo al Movidesk
     const movideskResponse = await fetch(
         `${config.movidesk.urlUploadFile}?token=${config.movidesk.token}&id=${ticketId}&actionId=1`, 
         {

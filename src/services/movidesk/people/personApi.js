@@ -1,5 +1,3 @@
-//Requisições HTTP puras (GET, POST, PATCH) para o Movidesk
-
 import { config } from "../../../config/env.js"
 
 const TOKEN = config.movidesk.token

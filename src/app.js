@@ -2,8 +2,9 @@ import figlet from "figlet"
 import pkg from '@slack/bolt';
 import express from "express"
 import { config } from "./config/env.js"
-import { registerTicketReaction } from "./events/reaction.js"
-import { homeTab } from "./homeTab/appHome.js"
+import { registerReactionHandler } from "./events/reactionHandler.js"
+import { registerEmailModal } from "./events/emailModal.js"
+import { homeTab } from "./events/appHome.js"
 import { webhookRoutes } from "./routes/webhookRoutes.js"
 import { printBanner } from "./utils/banner.js"
 
@@ -25,7 +26,8 @@ export const app = new App({
 receiver.app.use(express.json());
 
 webhookRoutes(receiver, app)
-registerTicketReaction(app)
+registerReactionHandler(app)
+registerEmailModal(app)
 homeTab(app)
 
 printBanner("TUNA   x   SUPORTE ")

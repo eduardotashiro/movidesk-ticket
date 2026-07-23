@@ -1,4 +1,4 @@
-import { ticketDedicated, ticketResolve, ticketUrgent, ticket24hForClose } from "../events/reaction.js";
+import { ticketDedicated, ticketResolve, ticketUrgent, ticket24hForClose } from "../notifications/ticketNotifications.js";
 
 export async function handle24hWebhook(app, req, res) {
     const payload = req.body;

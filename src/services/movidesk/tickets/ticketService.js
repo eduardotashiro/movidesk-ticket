@@ -2,7 +2,7 @@ import { createTicketRequest } from "./ticketApi.js"
 
 export async function createTicket({ clientId, assunto, descricao, threadContext }) {
 
-    //payload & partner cria o ticket, ajuda a liderança com as métricas e contabiliza quantidade e assunto de cada ticket
+    // payload también ayuda julio con las métricas: cuenta cantidad y asunto de cada ticket
     const ticketBody = {
         type: 2,
         subject: assunto,
