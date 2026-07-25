@@ -110,43 +110,45 @@ sequenceDiagram
 
 ```
 src/
-├── app.js                    # configuração do Bolt/Express e registro de rotas/eventos
-├── server.js                 # ponto de entrada, inicia o servidor
+├── app.ts                    # Configuración de Bolt/Express y registro de rutas/eventos
+├── server.ts                 # Punto de entrada, inicia el servidor
 ├── config/
-│   └── env.js                 # carrega e centraliza todas as variáveis de ambiente
+│   └── env.ts                # Carga y centraliza todas las variables de entorno
 ├── controllers/
-│   └── webhookController.js   # handlers HTTP dos webhooks (fino, delega pra notifications/)
+│   └── webhookController.ts  # Handlers HTTP de los webhooks (delega a notifications/)
 ├── routes/
-│   └── webhookRoutes.js       # mapeamento de rotas Express
-├── events/                    # listeners de eventos do Slack (Bolt)
-│   ├── reactionHandler.js     # reaction_added (:sos:)
-│   ├── emailModal.js          # modal de coleta de e-mail
-│   └── appHome.js             # app_home_opened
+│   └── webhookRoutes.ts      # Mapeo de rutas Express
+├── events/                   # Listeners de eventos de Slack (Bolt)
+│   ├── reactionHandler.ts    # reaction_added (:sos:)
+│   ├── emailModal.ts         # Modal de recolección de email
+│   └── appHome.ts            # app_home_opened
+├── image/                    # Recursos estáticos (imágenes del bot)
 ├── notifications/
-│   └── ticketNotifications.js # lógica das 4 notificações de webhook
+│   └── ticketNotifications.ts# Lógica de las 4 notificaciones de webhook
 ├── db/
-│   ├── connection.js           # pool de conexão PostgreSQL
-│   └── queries/                 # uma responsabilidade por arquivo
-│       ├── ticketMetadata.js    # vínculo ticket <-> thread do Slack
-│       ├── ticketMetrics.js     # contador global de tickets
-│       └── webhookStatus.js     # controle de duplicidade de notificações & notificações no canal do ONLY
+│   ├── connection.ts         # Pool de conexión PostgreSQL
+│   ├── schema.sql            # Script de creación de tablas
+│   └── queries/              # Una responsabilidad por archivo
+│       ├── ticketMetadata.ts # Vínculo ticket <-> thread de Slack
+│       ├── ticketMetrics.ts  # Contador global de tickets
+│       └── webhookStatus.ts  # Control de duplicidad de notificaciones
 └── services/
-    ├── slack/                  # utilidades específicas do Slack
-    │   ├── mentionParser.js     # resolve <@ID> pra nome real
-    │   ├── messageValidator.js  # detecta mensagem só-arquivo / só-emoji
-    │   └── threadContext.js     # monta link da thread pro ticket no Movidesk
-    ├── files/                  # validação e upload de anexos
-    │   ├── fileValidator.js
-    │   ├── attachmentFilter.js
-    │   ├── attachmentUploader.js
-    │   └── attachmentService.js
-    ├── movidesk/                # toda integração com a API do Movidesk
-    │   ├── people/               # Api (HTTP puro) + Service (orquestração)
-    │   ├── tickets/               # idem
+    ├── slack/                # Utilidades específicas de Slack
+    │   ├── mentionParser.ts  # Resuelve <@ID> a nombre real
+    │   ├── messageValidator.ts# Detecta mensaje solo-archivo / solo-emoji
+    │   └── threadContext.ts  # Construye el enlace del thread para el ticket
+    ├── files/                # Validación y subida de adjuntos
+    │   ├── fileValidator.ts
+    │   ├── attachmentFilter.ts
+    │   ├── attachmentUploader.ts
+    │   └── attachmentService.ts
+    ├── movidesk/             # Toda la integración con la API de Movidesk
+    │   ├── people/           # Api (HTTP puro) + Service (orquestación)
+    │   ├── tickets/          # Idem
     │   └── organizations/
-    │       └── relationshipResolver.js  # domínio de e-mail -> organização
+    │       └── relationshipResolver.ts # Dominio de email -> organización
     └── ticketFlow/
-        └── createTicketFromSlackMessage.js  # orquestra o fluxo completo de criação do tkt
+        └── createTicketFromSlackMessage.ts # Orquesta el flujo completo de creación
 ```
 
 **Padrão adotado**: módulos que fazem chamada HTTP externa são separados em

@@ -28,4 +28,4 @@ CREATE TABLE IF NOT EXISTS webhook_duplication_check_only_support (
 -- Necessário para o contador de tickets funcionar na primeira execução
 INSERT INTO contagem_tickets_global (id, total_tickets) 
 VALUES (1, 0) 
-ON CONFLICT (id) DO NOTHING;src/db/schema.sql
+ON CONFLICT (id) DO NOTHING;
