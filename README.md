@@ -257,7 +257,7 @@ Veja [`.env.example`](.env.example) para a lista completa. Os grupos principais:
 
 <div align="center">
 
-**Made with 💀 by [Eduardo Tashiro](https://www.linkedin.com/in/eduardo-tashiro-192096362/)**
+**Made with 💀 by [Eduardo Tashiro](https://github.com/eduardotashiro)**
 
 ⭐ **Star this repo if you find it useful!**
 
