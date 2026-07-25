@@ -9,10 +9,6 @@ export interface TicketSlackInfoRow {
     threadcontext: string
 }
 
-// NOTA: o contrato de retorno de sucesso/erro é inconsistente no JS original
-// (sucesso: void/objeto; erro: array vazio). Preservado assim na migração —
-// vale revisitar num próximo refactor, mas não é escopo desta tipagem.
-
 export async function saveTicketMetadata(
     ticket_id: number,
     slack_thread_ts: string,
@@ -21,20 +17,20 @@ export async function saveTicketMetadata(
     user_id: string,
     protocol: string,
     threadContext: string
-): Promise<any> {
+): Promise<void> {
     try {
         await pool.query(
             `insert into ticket_slack_metadata (ticket_id, slack_thread_ts, original_message_ts, slack_channel_id, user_id, protocol, threadContext)		
              values($1,$2,$3,$4,$5,$6,$7)`,
             [ticket_id, slack_thread_ts, original_message_ts, slack_channel_id, user_id, protocol, threadContext]
         )
-    } catch (error: any) {
-        console.error(`erro ao salvar metadados do ticket:`, error.message)
-        return []
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error)
+        console.error(`erro ao salvar metadados do ticket:`, message)
     }
 }
 
-export async function getTicketSlackInfo(webhook_ticket_id: number): Promise<any> {
+export async function getTicketSlackInfo(webhook_ticket_id: number): Promise<TicketSlackInfoRow | null> {
     try {
         const result = await pool.query<TicketSlackInfoRow>(
             `select ticket_id, slack_thread_ts, slack_channel_id, user_id, protocol, threadContext
@@ -42,10 +38,11 @@ export async function getTicketSlackInfo(webhook_ticket_id: number): Promise<any
             where ticket_id = $1`,
             [webhook_ticket_id]
         )
-        return result.rows[0]
-    } catch (error: any) {
-        console.error(`erro ao buscar info do slack para o ticket ${webhook_ticket_id}:`, error.message)
-        return []
+        return result.rows[0] ?? null
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error)
+        console.error(`erro ao buscar info do slack para o ticket ${webhook_ticket_id}:`, message)
+        return null
     }
 }
 
@@ -59,8 +56,9 @@ export async function checkTicketExists(slack_channel_id: string, original_messa
             [slack_channel_id, original_message_ts]
         )
         return (result.rowCount ?? 0) > 0
-    } catch (error: any) {
-        console.error(`erro ao checar ticket existente para canal ${slack_channel_id} e thread ${original_message_ts}: `, error.message)
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error)
+        console.error(`erro ao checar ticket existente para canal ${slack_channel_id} e thread ${original_message_ts}: `, message)
         return false
     }
 }

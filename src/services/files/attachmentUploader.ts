@@ -1,7 +1,7 @@
 import { config } from "../../config/env.js"
 import type { SlackFile } from "../../types/slack.js"
 
-export async function uploadSlackFileToMovidesk(ticketId: number, file: SlackFile): Promise<any> {
+export async function uploadSlackFileToMovidesk(ticketId: number, file: SlackFile): Promise<void> {
 
     // descarga el archivo desde Slack
     const slackResponse = await fetch(file.url_private, {
@@ -10,8 +10,9 @@ export async function uploadSlackFileToMovidesk(ticketId: number, file: SlackFil
         }
     })
 
-    if (!slackResponse.ok)
-        throw new Error("Aquivo não suportado")
+    if (!slackResponse.ok) {
+        throw new Error("Arquivo não suportado")
+    }
 
     const formData = new FormData()
     formData.append("file", await slackResponse.blob(), file.name)
@@ -31,5 +32,5 @@ export async function uploadSlackFileToMovidesk(ticketId: number, file: SlackFil
         throw new Error("Não foi possível anexar o arquivo ao ticket.\n\nTente novamente mais tarde.")
     }
 
-    return await movideskResponse.json()
+    await movideskResponse.json()
 }

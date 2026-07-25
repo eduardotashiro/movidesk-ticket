@@ -14,8 +14,3 @@ export interface WebhookStatus {
     ticketId: number
     notificationType: string
 }
-
-export interface WebhookStatus {
-    ticketId: number
-    notificationType: string
-}

@@ -53,7 +53,7 @@ export function registerReactionHandler(app: App): void {
             }
 
             const messageAuthorInfo = await client.users.info({ user: messageAuthorId })
-            const email = messageAuthorInfo.user?.profile?.email
+            const email = undefined// messageAuthorInfo.user?.profile?.email
             const name = messageAuthorInfo.user?.profile?.real_name ?? ""
 
             // si el usuario no tiene email registrado en slack, se le pide vía modal
@@ -113,8 +113,9 @@ export function registerReactionHandler(app: App): void {
                 files
             })
 
-        } catch (error) {
-            console.error("Erro ao criar o ticket:", error)
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : String(error)
+            console.error("Erro ao criar o ticket:", message)
             await client.chat.postMessage({
                 channel: event.item.channel,
                 thread_ts: placeholderTs || event.item.ts,

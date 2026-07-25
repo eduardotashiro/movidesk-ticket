@@ -26,8 +26,9 @@ export async function ticketResolve(app: App, webhook_ticket_id: number): Promis
         })
         await markWebhookSent(webhook_ticket_id, "webhook_resolve_sent")
 
-    } catch (error: any) {
-        console.log(`erro ao enviar resolvido no slack:`, error.message)
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error)
+        console.log(`erro ao enviar resolvido no slack:`, message)
     }
 }
 
@@ -54,8 +55,9 @@ export async function ticket24hForClose(app: App, webhook_ticket_id: number): Pr
 
         await markWebhookSent(webhook_ticket_id, "webhook_24h_sent")
 
-    } catch (error: any) {
-        console.log(`erro ao enviar resolvido no slack:`, error.message)
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error)
+        console.log(`erro ao enviar 24h no slack:`, message)
     }
 }
 
@@ -84,10 +86,13 @@ export async function ticketDedicated(app: App, payload: DedicatedWebhookPayload
         })
         await markWebhookProcessed(webhook_key)
         console.log(`Notificación enviada al ticket. ${ticket_id}`)
-    } catch (error: any) {
-        console.error("Error al enviar la notificación:", error.message)
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error)
+        console.error("Error al enviar la notificación:", message)
     }
 }
+
+
 
 // Notificación de llamada urgente
 export async function ticketUrgent(app: App, payload: UrgentWebhookPayload): Promise<void> {
@@ -115,7 +120,8 @@ export async function ticketUrgent(app: App, payload: UrgentWebhookPayload): Pro
         })
         await markWebhookProcessed(webhook_key)
         console.log(`Notificación enviada al ticket. ${ticket_id}`)
-    } catch (error: any) {
-        console.error("Error al enviar la notificación:", error.message)
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error)
+        console.error("Error al enviar la notificación:", message)
     }
 }

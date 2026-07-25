@@ -1,11 +1,20 @@
-# TUNA x SUPORTE - Movidesk Ticket Bot 🆘
+<div align="center">
 
-![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js&logoColor=white)
-![Express](https://img.shields.io/badge/Express-5.x-black?logo=express)
-![Slack Bolt](https://img.shields.io/badge/Slack-Bolt-4A154B?logo=slack)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Railway-blue?logo=postgresql)
-![Vitest](https://img.shields.io/badge/Tested_with-Vitest-6E9F18?logo=vitest)
-![License](https://img.shields.io/badge/license-MIT-green)
+![Tuna x Suporte Banner](.github/assets/banner.gif)
+
+[![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
+[![Slack Bolt](https://img.shields.io/badge/Slack-Bolt-4A154B?logo=slack)](https://slack.dev/bolt-js/)
+[![Express](https://img.shields.io/badge/Express-4.x-black?logo=express)](https://expressjs.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue?logo=postgresql)](https://www.postgresql.org/)
+[![Vitest](https://img.shields.io/badge/Vitest-2.0-6E9F18?logo=vitest)](https://vitest.dev/)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
+**Integração Slack to Movidesk para abertura e gestão automática de tickets de suporte**
+
+</div>
+
+---
 
 Bot de Slack que integra o time de suporte da Tuna Pagamentos ao Movidesk.
 Qualquer pessoa no workspace pode abrir um ticket de suporte reagindo com
@@ -14,7 +23,7 @@ sem sair do Slack.
 
 ## Funcionalidades
 
-- **Criação de ticket por reação**: reagir com `:sos:` em qualquer mensagem
+- **Criação de ticket por reação**: reagir com 🆘 -> `:sos:` em qualquer mensagem
   (ou thread) abre um ticket no Movidesk com o conteúdo da mensagem.
 
 - **Coleta de e-mail via modal**: se o autor da mensagem não tem e-mail
@@ -39,6 +48,20 @@ sem sair do Slack.
 
 - **Prevenção de duplicidade**: reagir duas vezes na mesma mensagem não
   cria um segundo ticket; notificações de webhook também não são reenviadas.
+
+## Demonstração do Fluxo
+
+### 1. Abertura via Reação `🆘`
+![Abertura via Reação](.github/assets/demo-reacao.gif)
+
+### 2. Coleta de E-mail (quando necessário)
+![Coleta de E-mail](.github/assets/demo-email.gif)
+
+### 3. Notificação de 24h sem resposta
+![Notificação 24h](.github/assets/demo-24h.png)
+
+### 4. Ticket Resolvido
+![Ticket Resolvido](.github/assets/demo-resolvido.png)
 
 ## Fluxo de criação de ticket
 
@@ -162,9 +185,11 @@ seguindo o exemplo de `movidesk/people/` e `movidesk/tickets/`.
    Veja a seção [Variáveis de ambiente](#variáveis-de-ambiente) abaixo para
    o que cada chave significa.
 
-3. Rode as migrations/crie as tabelas necessárias no banco:
-   `ticket_slack_metadata`, `contagem_tickets_global` e
-   `webhook_duplication_check_only_support` (ver `src/db/queries/`).
+3. Configure o banco de dados executando o script de schema fornecido:
+   ```bash
+   psql $DATABASE_URL -f src/db/schema.sql
+   ```
+   Como alternativa, execute o conteúdo do arquivo [`schema.sql`](src/db/schema.sql) utilizando um cliente SQL compatível com PostgreSQL, como DBeaver ou pgAdmin.
 
 ## Rodando localmente
 
@@ -175,8 +200,23 @@ npm run tunnel      # expõe a porta 3000 via ngrok (necessário para os
                      # eventos do Slack chegarem no seu ambiente local)
 ```
 
-Depois de subir o `ngrok`, atualize a **Request URL** em Event Subscriptions
-no painel do seu app Slack com a URL gerada.
+Depois de subir o `ngrok`, atualize a **Request URL** em Event Subscriptions e Interactivity & Shortcuts
+no painel API do seu app Slack com a URL gerada.
+
+## Via Docker
+
+Se você tem Docker e Docker Compose instalados, pode subir a aplicação e o banco de dados com um único comando:
+
+**Garanta que o arquivo .env está preenchido**
+# 1. Suba os containers
+```bash
+docker compose up -d --build
+```
+
+# 2. Para ver os logs em tempo real
+```bash
+docker compose logs -f app
+```
 
 ## Testes
 
@@ -213,6 +253,14 @@ Veja [`.env.example`](.env.example) para a lista completa. Os grupos principais:
 
 - [Attachments API](https://atendimento.movidesk.com/kb/pt-br/article/518585/api-de-anexos)
 
-## Autor
+---
 
-Eduardo Tashiro - [github.com/eduardotashiro](https://github.com/eduardotashiro)
+<div align="center">
+
+**Made with 💀 by [Eduardo Tashiro](https://www.linkedin.com/in/eduardo-tashiro-192096362/)**
+
+⭐ **Star this repo if you find it useful!**
+
+[![GitHub stars](https://img.shields.io/github/stars/eduardotashiro/movidesk-ticket?style=social)](https://github.com/eduardotashiro/movidesk-ticket/stargazers)
+
+</div>

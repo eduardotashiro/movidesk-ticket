@@ -49,12 +49,12 @@ export async function createTicketFromSlackMessage({
 
     const linkMovidesk = `${config.movidesk.urlTicketLink}${ticket.protocol}`
     await client.chat.update({
-        channel: channel,
+        channel,
         ts: updateTs,
         text: `Olá <@${messageAuthorId}> :wave::skin-tone-4:\n\nSeu ticket foi criado na *Central de Ajuda Tuna*.  Acompanhe sua solicitação em: <${linkMovidesk}|${ticket.protocol}>.\n\n\`\`\`Se for seu primeiro acesso, acesse "Obter uma senha" na página de login.\`\`\`\nAgradecemos sua atenção.`,
     })
 
-    saveTicketMetadata(ticket.id, updateTs, originalMessage.ts, channel, messageAuthorId, ticket.protocol, linkMovidesk)
+    await saveTicketMetadata(ticket.id, updateTs, originalMessage.ts, channel, messageAuthorId, ticket.protocol, linkMovidesk)
 
     await handleTicketAttachments({
         files,

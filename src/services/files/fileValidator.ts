@@ -3,7 +3,7 @@ import type { SlackFile } from "../../types/slack.js"
 const ALLOWED_EXTENSIONS = [
     "pdf", "doc", "docx", "xls", "xlsx", "csv",
     "png", "jpg", "jpeg", "txt", "zip", "mp4"
-]
+] 
 
 const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024 // 20 MB
 

@@ -6,7 +6,7 @@ export function homeTab(app: App): void {
     app.event("app_home_opened", async ({ event, client }) => {
 
         const metrics = await getTotalTicketsCount()
-        const ticketCount = metrics?.total_tickets
+        const ticketCount = metrics?.total_tickets ?? 0
 
         try {
             await client.views.publish({
@@ -33,8 +33,9 @@ export function homeTab(app: App): void {
                     ],
                 },
             })
-        } catch (error: any) {
-            console.error("Erro ao publicar a Home Tab:", error.message)
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : String(error)
+            console.error("Erro ao publicar a Home Tab:", message)
         }
     })
 }

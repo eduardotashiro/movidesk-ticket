@@ -1,5 +1,10 @@
 import { getRelationships } from "../organizations/relationshipResolver.js"
-import {findMovideskPersonByEmail, findMovideskPersonByUserName, createMovideskPerson, updateMovideskPerson} from "./personApi.js"
+import {
+    findMovideskPersonByEmail,
+    findMovideskPersonByUserName,
+    createMovideskPerson,
+    updateMovideskPerson
+} from "./personApi.js"
 
 import type { MovideskPerson } from "../../../types/movidesk.js"
 
@@ -57,7 +62,7 @@ async function activatePerson(person: MovideskPerson): Promise<void> {
 export async function syncMovideskPerson(email: string, name: string): Promise<number> {
     const emailMatches = await findMovideskPersonByEmail(email)
 
-    if (emailMatches?.length > 0) {
+    if (emailMatches.length > 0) {
         const person = emailMatches[0]
         await syncOrganization(person, email)
         await activatePerson(person)
@@ -67,7 +72,7 @@ export async function syncMovideskPerson(email: string, name: string): Promise<n
 
     const userNameMatches = await findMovideskPersonByUserName(email)
 
-    if (userNameMatches?.length > 0) {
+    if (userNameMatches.length > 0) {
         const person = userNameMatches[0]
         await fixMisplacedEmail(person.id, email)
         await syncOrganization(person, email)

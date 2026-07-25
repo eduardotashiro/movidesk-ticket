@@ -5,7 +5,7 @@ const TOKEN = config.movidesk.token
 const URL_CRUD_PERSON = config.movidesk.urlCrudPerson
 
 export async function findMovideskPersonByEmail(email: string): Promise<MovideskPerson[]> {
-    const url = `${URL_CRUD_PERSON}${TOKEN}&$filter=emails/any(e: e/email eq '${email}')`
+const url = `${URL_CRUD_PERSON}${TOKEN}&$filter=emails/any(e: e/email eq '${encodeURIComponent(email)}')`
     const response = await fetch(url)
     if (!response.ok) {
         const text = await response.text()
@@ -16,7 +16,7 @@ export async function findMovideskPersonByEmail(email: string): Promise<Movidesk
 }
 
 export async function findMovideskPersonByUserName(email: string): Promise<MovideskPerson[]> {
-    const url = `${URL_CRUD_PERSON}${TOKEN}&$filter=userName eq '${email}'`
+    const url = `${URL_CRUD_PERSON}${TOKEN}&$filter=userName eq '${encodeURIComponent(email)}'`
     const response = await fetch(url)
     if (!response.ok) {
         const text = await response.text()

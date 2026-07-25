@@ -1,17 +1,28 @@
 import { describe, it, expect } from "vitest"
 import { isOnlyFiles, isOnlyEmojis } from "./messageValidator.js"
+import type { SlackFile } from "../../types/slack.js"
+
+function buildFakeFile(overrides: Partial<SlackFile> = {}): SlackFile {
+    return {
+        name: "foto.png",
+        filetype: "png",
+        size: 1000,
+        url_private: "https://fake-slack-url.com/foto.png",
+        ...overrides
+    }
+}
 
 describe("isOnlyFiles", () => {
     it("retorna true quando não há texto e há arquivos", () => {
-        expect(isOnlyFiles("", [{ name: "foto.png" }])).toBe(true)
+        expect(isOnlyFiles("", [buildFakeFile()])).toBe(true)
     })
 
     it("retorna true quando o texto é só espaços em branco e há arquivos", () => {
-        expect(isOnlyFiles("   ", [{ name: "foto.png" }])).toBe(true)
+        expect(isOnlyFiles("   ", [buildFakeFile()])).toBe(true)
     })
 
     it("retorna false quando há texto e arquivos", () => {
-        expect(isOnlyFiles("preciso de ajuda", [{ name: "foto.png" }])).toBe(false)
+        expect(isOnlyFiles("preciso de ajuda", [buildFakeFile()])).toBe(false)
     })
 
     it("retorna false quando não há arquivos, mesmo sem texto", () => {
@@ -22,6 +33,7 @@ describe("isOnlyFiles", () => {
         expect(isOnlyFiles("preciso de ajuda", [])).toBe(false)
     })
 })
+
 
 describe("isOnlyEmojis", () => {
     it("retorna true para um único emoji", () => {

@@ -13,7 +13,8 @@ vi.mock("../../../config/env.js", () => ({
 
 const { getRelationships } = await import("./relationshipResolver.js")
 
-describe("getRelationships", () => {
+describe("getRelationships", () => {    
+
     it("reconhece o domínio da Angeloni", () => {
         const [relationship] = getRelationships("fulano@angeloni.com.br")
         expect(relationship.id).toBe("1")

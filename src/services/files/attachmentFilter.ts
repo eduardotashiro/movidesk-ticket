@@ -1,4 +1,5 @@
 import { isFileAllowed, isFileSizeAllowed } from "./fileValidator.js"
+import { FileValidationReason } from "../../types/attachment.js"
 import type { SlackFile } from "../../types/slack.js"
 
 export interface ProcessFilesResult {
@@ -13,8 +14,8 @@ export function processFiles(files: SlackFile[]): ProcessFilesResult {
 
     const rejectedDetails = rejectedFiles.map((f) => {
         const reasons: string[] = []
-        if (!isFileAllowed(f)) reasons.push("extensão não permitida")
-        if (!isFileSizeAllowed(f)) reasons.push("acima de 20 MB")
+        if (!isFileAllowed(f)) reasons.push(FileValidationReason.INVALID_EXTENSION)
+        if (!isFileSizeAllowed(f)) reasons.push(FileValidationReason.MAX_SIZE)
         return `• ${f.name} (${reasons.join(" e ")})`
     }).join("\n")
 

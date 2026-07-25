@@ -1,9 +1,7 @@
 import { createTicketRequest } from "./ticketApi.js"
 import type { CreateTicketInput, TicketResponse } from "../../../types/movidesk.js"
-
 export async function createTicket({ clientId, assunto, descricao, threadContext }: CreateTicketInput): Promise<TicketResponse> {
 
-    // payload también ayuda con las métricas: cuenta cantidad y asunto de cada ticket
     const ticketBody = {
         type: 2,
         subject: assunto,

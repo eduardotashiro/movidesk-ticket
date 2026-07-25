@@ -14,5 +14,5 @@ export function buildThreadContext(channel: string, originalMessage: SlackMessag
         threadLink = `${config.slack.linkThread}${channel}/p${originalMessage.ts.replace(".", "")}`
     }
 
-    return `<a href="${threadLink}"target="_blank">Abrir Thread no Slack</a>`
+    return `<a href="${threadLink}" target="_blank">Abrir Thread no Slack</a>`
 }

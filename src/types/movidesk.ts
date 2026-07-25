@@ -40,3 +40,29 @@ export interface DedicatedWebhookPayload {
 export interface UrgentWebhookPayload {
     Id: number
 }
+
+export interface MovideskCreateTicketPayload {
+    type: number
+    subject: string
+    category: null
+    serviceFirstLevelId: null
+    serviceFirstLevel: null
+    serviceSecondLevel: null
+    serviceThirdLevel: null
+    urgency: string
+    status: string
+    createdBy: {
+        id: number
+    }
+    clients: Array<{
+        id: number
+    }>
+    actions: Array<{
+        type: number
+        origin: number
+        description: string
+        createdBy: {
+            id: number
+        }
+    }>
+}

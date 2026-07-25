@@ -19,70 +19,76 @@ const {
 } = await import("./personApi.js")
 const { syncMovideskPerson } = await import("./personService.js")
 
+const mockedGetRelationships = vi.mocked(getRelationships)
+const mockedFindMovideskPersonByEmail = vi.mocked(findMovideskPersonByEmail)
+const mockedFindMovideskPersonByUserName = vi.mocked(findMovideskPersonByUserName)
+const mockedCreateMovideskPerson = vi.mocked(createMovideskPerson)
+const mockedUpdateMovideskPerson = vi.mocked(updateMovideskPerson)
+
 const FAKE_RELATIONSHIP = [{ id: "999", name: "Não é cliente" }]
 
 describe("syncMovideskPerson", () => {
     beforeEach(() => {
         vi.clearAllMocks()
-        getRelationships.mockReturnValue(FAKE_RELATIONSHIP)
+        mockedGetRelationships.mockReturnValue(FAKE_RELATIONSHIP)
     })
 
     it("retorna o id direto quando a pessoa já existe, ativa e com organização", async () => {
-        findMovideskPersonByEmail.mockResolvedValue([
+        mockedFindMovideskPersonByEmail.mockResolvedValue([
             { id: 1, isActive: true, relationships: [{ id: "999" }] }
         ])
 
         const id = await syncMovideskPerson("user@teste.com", "Usuário Teste")
 
         expect(id).toBe(1)
-        expect(updateMovideskPerson).not.toHaveBeenCalled()
-        expect(createMovideskPerson).not.toHaveBeenCalled()
+        expect(mockedUpdateMovideskPerson).not.toHaveBeenCalled()
+        expect(mockedCreateMovideskPerson).not.toHaveBeenCalled()
     })
 
     it("vincula organização quando a pessoa existe mas não tem relationships", async () => {
-        findMovideskPersonByEmail.mockResolvedValue([
+        mockedFindMovideskPersonByEmail.mockResolvedValue([
             { id: 2, isActive: true, relationships: [] }
         ])
 
         const id = await syncMovideskPerson("user@teste.com", "Usuário Teste")
 
         expect(id).toBe(2)
-        expect(updateMovideskPerson).toHaveBeenCalledWith(2, { relationships: FAKE_RELATIONSHIP })
+        expect(mockedUpdateMovideskPerson).toHaveBeenCalledWith(2, { relationships: FAKE_RELATIONSHIP })
     })
 
     it("reativa a pessoa quando ela existe mas está inativa", async () => {
-        findMovideskPersonByEmail.mockResolvedValue([
+        mockedFindMovideskPersonByEmail.mockResolvedValue([
             { id: 3, isActive: false, relationships: [{ id: "999" }] }
         ])
 
         await syncMovideskPerson("user@teste.com", "Usuário Teste")
 
-        expect(updateMovideskPerson).toHaveBeenCalledWith(3, { isActive: true })
+        expect(mockedUpdateMovideskPerson).toHaveBeenCalledWith(3, { isActive: true })
     })
 
     it("corrige o email quando a pessoa só é encontrada pelo userName", async () => {
-        findMovideskPersonByEmail.mockResolvedValue([])
-        findMovideskPersonByUserName.mockResolvedValue([
+        mockedFindMovideskPersonByEmail.mockResolvedValue([])
+        mockedFindMovideskPersonByUserName.mockResolvedValue([
             { id: 4, isActive: true, relationships: [{ id: "999" }] }
         ])
 
         const id = await syncMovideskPerson("user@teste.com", "Usuário Teste")
 
         expect(id).toBe(4)
-        expect(updateMovideskPerson).toHaveBeenCalledWith(4, {
+        expect(mockedUpdateMovideskPerson).toHaveBeenCalledWith(4, {
             emails: [{ emailType: "Pessoal", email: "user@teste.com", isDefault: true }]
         })
     })
 
     it("cria uma pessoa nova quando não encontra por email nem por userName", async () => {
-        findMovideskPersonByEmail.mockResolvedValue([])
-        findMovideskPersonByUserName.mockResolvedValue([])
-        createMovideskPerson.mockResolvedValue({ id: 5 })
+        mockedFindMovideskPersonByEmail.mockResolvedValue([])
+        mockedFindMovideskPersonByUserName.mockResolvedValue([])
+        mockedCreateMovideskPerson.mockResolvedValue({ id: 5 } as any)
 
         const id = await syncMovideskPerson("novo@teste.com", "Pessoa Nova")
 
         expect(id).toBe(5)
-        expect(createMovideskPerson).toHaveBeenCalledWith(
+        expect(mockedCreateMovideskPerson).toHaveBeenCalledWith(
             expect.objectContaining({
                 userName: "novo@teste.com",
                 businessName: "Pessoa Nova",

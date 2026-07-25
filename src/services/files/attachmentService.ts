@@ -4,7 +4,7 @@ import { uploadSlackFileToMovidesk } from "./attachmentUploader.js"
 import type { SlackFile } from "../../types/slack.js"
 
 export interface HandleTicketAttachmentsInput {
-    files: SlackFile[] | undefined
+    files: SlackFile[]
     ticketId: number
     client: WebClient
     channel: string
@@ -18,7 +18,7 @@ export async function handleTicketAttachments({ files, ticketId, client, channel
 
     if (rejectedFiles.length > 0) {
         await client.chat.postMessage({
-            channel: channel,
+            channel,
             thread_ts: threadTs,
             text: `:warning: Não foi possível anexar os seguintes arquivos:\n\`\`\`${rejectedDetails}\`\`\``
         })
