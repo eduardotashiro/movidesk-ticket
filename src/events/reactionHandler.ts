@@ -53,7 +53,7 @@ export function registerReactionHandler(app: App): void {
             }
 
             const messageAuthorInfo = await client.users.info({ user: messageAuthorId })
-            const email = undefined// messageAuthorInfo.user?.profile?.email
+            const email = messageAuthorInfo.user?.profile?.email
             const name = messageAuthorInfo.user?.profile?.real_name ?? ""
 
             // si el usuario no tiene email registrado en slack, se le pide vía modal
