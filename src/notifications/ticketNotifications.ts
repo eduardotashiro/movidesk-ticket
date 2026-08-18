@@ -74,7 +74,27 @@ export async function ticketDedicated(app: App, payload: DedicatedWebhookPayload
         }
 
         const response = await fetch(`${config.movidesk.urlCreateTicket}${config.movidesk.token}&id=${ticket_id}`)
-        const fullTicket: MovideskTicketFull = await response.json()
+
+        if (!response.ok) {
+            console.error(`erro API: ${response.status} - ${response.statusText}`)
+            return
+        }
+
+        const responseText = await response.text()
+
+        console.log("STATUS:", response.status)
+        console.log("CONTENT-TYPE:", response.headers.get("content-type"))
+        console.log("RESPONSE:", responseText)
+
+        let fullTicket: MovideskTicketFull
+
+        try {
+            fullTicket = JSON.parse(responseText)
+        } catch (parseError) {
+            console.error(`erro ao parsear JSON: ${parseError}. | retorno: ${responseText}`)
+            return
+        }
+
 
         const protocol = fullTicket.protocol || ticket_id
         const urgency = payload.Urgency || "Não especificada"
@@ -107,7 +127,26 @@ export async function ticketUrgent(app: App, payload: UrgentWebhookPayload): Pro
         }
 
         const response = await fetch(`${config.movidesk.urlCreateTicket}${config.movidesk.token}&id=${ticket_id}`)
-        const fullTicket: MovideskTicketFull = await response.json()
+
+        if (!response.ok) {
+            console.error(`erro API: ${response.status} - ${response.statusText}`)
+            return
+        }
+
+        const responseText = await response.text()
+
+        console.log("STATUS:", response.status)
+        console.log("CONTENT-TYPE:", response.headers.get("content-type"))
+        console.log("RESPONSE:", responseText)
+
+        let fullTicket: MovideskTicketFull
+
+        try {
+            fullTicket = JSON.parse(responseText)
+        } catch (parseError) {
+            console.error(`erro ao parsear JSON: ${parseError}. | retorno: ${responseText}`)
+            return
+        }
 
         const organization = fullTicket.clients?.[0]?.organization?.businessName || "Organização não encontrada"
         const protocol = fullTicket.protocol || ticket_id
